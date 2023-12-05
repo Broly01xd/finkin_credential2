@@ -511,7 +511,7 @@ class _LoanFormState extends State<LoanForm> {
             Expanded(
               child: GestureDetector(
                 child:
-                    _buildCompanyTypeButton('Self Employed', AppColor.primary),
+                    _buildEmployeeTypeButton('Self Employed', AppColor.primary),
               ),
             ),
             const SizedBox(width: 4),
