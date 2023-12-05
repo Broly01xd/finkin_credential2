@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "518712046700",
+    "project_id": "finkin-credential",
+    "storage_bucket": "finkin-credential.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:518712046700:android:007b241cdc35802c1fd449",
+        "android_client_info": {
+          "package_name": "com.example.finkin_credential"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfhA3bRTAG0Mo8K4u49J5zW_JZuM6p1qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
