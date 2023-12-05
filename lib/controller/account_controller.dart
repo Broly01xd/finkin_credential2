@@ -23,8 +23,8 @@ class AccountController extends GetxController {
         fullName.value = userDoc['Name'] ?? '';
         location.value = userDoc['Address'] ?? '';
         email.value = userDoc['Email'] ?? '';
-        aadharCardNumber.value = userDoc['aadharCardNumber'] ?? '';
-        panCardNumber.value = userDoc['panCardNumber'] ?? '';
+        aadharCardNumber.value = userDoc['Aadhar'] ?? '';
+        panCardNumber.value = userDoc['Pan'] ?? '';
       } else {
         print("User with agentId $agentId not found");
       }

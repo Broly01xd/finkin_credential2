@@ -175,8 +175,8 @@ class _AgentFormState extends State<AgentForm> {
                 LabeledTextField(
                   label: 'Enter Last Name',
                   hintText: 'Enter Last Name',
-                  // regexPattern: AgentFormController.nameRegex,
-                  // controller: controller.lastNameController,
+                  regexPattern: AgentFormController.nameRegex,
+                  controller: controller.lastNameController,
                 ),
                 const SizedBox(
                   height: 5,
@@ -184,8 +184,8 @@ class _AgentFormState extends State<AgentForm> {
                 LabeledTextField(
                   label: 'Enter Phone Number',
                   hintText: 'Enter Phone Number',
-                  // regexPattern: AgentFormController.phoneNumberRegex,
-                  // controller: controller.phoneNumberController,
+                  regexPattern: AgentFormController.phoneNumberRegex,
+                  controller: controller.phoneNumberController,
                 ),
                 const SizedBox(
                   height: 5,
@@ -193,8 +193,8 @@ class _AgentFormState extends State<AgentForm> {
                 LabeledTextField(
                   label: 'Enter Your Aadhar card Number',
                   hintText: 'Enter Your Aadhar card Number',
-                  // regexPattern: AgentFormController.aadharCardRegex,
-                  // controller: controller.aadharCardController,
+                  regexPattern: AgentFormController.aadharCardRegex,
+                  controller: controller.aadharCardController,
                 ),
                 const SizedBox(
                   height: 10,
@@ -202,8 +202,8 @@ class _AgentFormState extends State<AgentForm> {
                 LabeledTextField(
                   label: 'Enter Your Pan card Number',
                   hintText: 'Enter Your Pan card Number',
-                  // regexPattern: AgentFormController.panCardRegex,
-                  // controller: controller.panCardController,
+                  regexPattern: AgentFormController.panCardRegex,
+                  controller: controller.panCardController,
                 ),
                 const SizedBox(
                   height: 10,
@@ -211,8 +211,8 @@ class _AgentFormState extends State<AgentForm> {
                 LabeledTextField(
                   label: 'Enter Your Email Id',
                   hintText: 'Enter Your Email Id',
-                  // regexPattern: AgentFormController.emailRegex,
-                  // controller: controller.emailController,
+                  regexPattern: AgentFormController.emailRegex,
+                  controller: controller.emailController,
                 ),
                 const SizedBox(
                   height: 10,

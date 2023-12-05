@@ -245,7 +245,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   void _showAccountInfoBottomSheet(BuildContext context) {
-    showBottomSheet(
+    showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
@@ -342,10 +342,19 @@ class _AccountScreenState extends State<AccountScreen> {
                       cursorColor: Colors.white,
                     ),
                   ),
-                  const ListTile(
-                    leading: Icon(Icons.email, color: Colors.white),
+                  ListTile(
+                    leading: const Icon(Icons.email, color: Colors.white),
                     title: TextField(
-                      decoration: InputDecoration(
+                      controller: TextEditingController(
+                          text: accountController.email.value),
+                      onChanged: (value) {
+                        // Update the value in the GetX controller
+                        accountController.email.value = value;
+                        // Update the corresponding field in Firestore
+                        _updateFieldInFirestore('Email', value,
+                            agentId: loginController.agentId.value);
+                      },
+                      decoration: const InputDecoration(
                         labelText: "Email",
                         labelStyle: TextStyle(color: Colors.white),
                         focusedBorder: OutlineInputBorder(
@@ -355,17 +364,27 @@ class _AccountScreenState extends State<AccountScreen> {
                           borderSide: BorderSide(color: Colors.transparent),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                     ),
                   ),
-                  const ListTile(
-                    leading: Icon(
+                  ListTile(
+                    leading: const Icon(
                       Icons.credit_card,
                       color: Colors.white,
                     ),
                     title: TextField(
-                      decoration: InputDecoration(
+                      controller: TextEditingController(
+                          text: accountController.aadharCardNumber.value),
+                      onChanged: (value) {
+                        // Update the value in the GetX controller
+                        accountController.aadharCardNumber.value = value;
+                        // Update the corresponding field in Firestore
+                        _updateFieldInFirestore('Aadhar', value,
+                            agentId: loginController.agentId.value);
+                      },
+                      readOnly: true,
+                      decoration: const InputDecoration(
                         labelText: "Aadhar Card Number",
                         labelStyle: TextStyle(color: Colors.white),
                         focusedBorder: OutlineInputBorder(
@@ -375,17 +394,27 @@ class _AccountScreenState extends State<AccountScreen> {
                           borderSide: BorderSide(color: Colors.transparent),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                     ),
                   ),
-                  const ListTile(
-                    leading: Icon(
+                  ListTile(
+                    leading: const Icon(
                       Icons.description,
                       color: Colors.white,
                     ),
                     title: TextField(
-                      decoration: InputDecoration(
+                      controller: TextEditingController(
+                          text: accountController.panCardNumber.value),
+                      onChanged: (value) {
+                        // Update the value in the GetX controller
+                        accountController.panCardNumber.value = value;
+                        // Update the corresponding field in Firestore
+                        _updateFieldInFirestore('Pan', value,
+                            agentId: loginController.agentId.value);
+                      },
+                      readOnly: true,
+                      decoration: const InputDecoration(
                         labelText: "Pan Card Number",
                         labelStyle: TextStyle(color: Colors.white),
                         focusedBorder: OutlineInputBorder(
@@ -395,7 +424,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           borderSide: BorderSide(color: Colors.transparent),
                         ),
                       ),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       cursorColor: Colors.white,
                     ),
                   ),
