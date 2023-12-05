@@ -245,7 +245,7 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   void _showAccountInfoBottomSheet(BuildContext context) {
-    showBottomSheet(
+    showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {

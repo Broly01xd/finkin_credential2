@@ -12,23 +12,9 @@ class Category {
 }
 
 List<Category> categories = [
+  
   Category(
-    imagePath: ImageAsset.education,
-    text: 'Home Loan',
-    onTap: (BuildContext context) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const LoanForm(
-            title: 'Home Loan',
-            agentId: '',
-          ),
-        ),
-      );
-    },
-  ),
-  Category(
-    imagePath: ImageAsset.education,
+    imagePath: ImageAsset.educationloan,
     text: 'Business Loans ',
     onTap: (BuildContext context) {
       Navigator.push(
@@ -43,7 +29,7 @@ List<Category> categories = [
     },
   ),
   Category(
-    imagePath: ImageAsset.education,
+    imagePath: ImageAsset.loan5,
     text: 'Education Loan',
     onTap: (BuildContext context) {
       User? user = FirebaseAuth.instance.currentUser;
@@ -59,23 +45,26 @@ List<Category> categories = [
       }
     },
   ),
+  
+  
   Category(
-    imagePath: ImageAsset.education,
-    text: 'Bank Loan',
+    imagePath: ImageAsset.bussinessloan,
+    text: 'Home Loan',
     onTap: (BuildContext context) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoanForm(
-            title: 'Bank Loan',
+          builder: (context) => const LoanForm(
+            title: 'Home Loan',
             agentId: '',
           ),
         ),
       );
     },
   ),
+ 
   Category(
-    imagePath: ImageAsset.education,
+    imagePath: ImageAsset.pl,
     text: ' Personal Loans',
     onTap: (BuildContext context) {
       Navigator.push(
@@ -89,8 +78,23 @@ List<Category> categories = [
       );
     },
   ),
-  Category(
-    imagePath: ImageAsset.education,
+   Category(
+    imagePath: ImageAsset.homeloan,
+    text: 'Bank Loan',
+    onTap: (BuildContext context) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoanForm(
+            title: 'Bank Loan',
+            agentId: '',
+          ),
+        ),
+      );
+    },
+  ),
+   Category(
+    imagePath: ImageAsset.jair,
     text: ' Car Loans',
     onTap: (BuildContext context) {
       Navigator.push(
@@ -104,4 +108,5 @@ List<Category> categories = [
       );
     },
   ),
+ 
 ];
