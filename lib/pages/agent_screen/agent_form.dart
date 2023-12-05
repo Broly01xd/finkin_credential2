@@ -126,7 +126,7 @@ class _AgentFormState extends State<AgentForm> {
                                     : (imageUrl.isNotEmpty
                                         ? NetworkImage(imageUrl)
                                         : const AssetImage(
-                                            'assets/images/gray.avif')))
+                                            'assets/images/image.png')))
                                 as ImageProvider<Object>?,
                             radius: 40,
                           ),

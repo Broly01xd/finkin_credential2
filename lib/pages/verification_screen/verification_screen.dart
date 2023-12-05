@@ -40,7 +40,7 @@ class VerificationScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 5, bottom: 4),
                 child: Center(
                   child: Image.asset(
-                    'assets/images/hill.png',
+                    'assets/images/hill.jpg',
                     width: 400,
                     height: 210,
                   ),
