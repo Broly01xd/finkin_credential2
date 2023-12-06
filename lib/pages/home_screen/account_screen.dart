@@ -30,7 +30,6 @@ class _AccountScreenState extends State<AccountScreen> {
   void initState() {
     super.initState();
     String id = loginController.agentId.value;
-    // Fetch user details when the screen is initialized
     accountController.fetchUserDetails(id);
   }
 
