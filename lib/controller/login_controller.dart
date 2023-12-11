@@ -56,22 +56,75 @@ class LoginController extends GetxController
     });
   }
 
-  getOtp() async {
-    isButtonClickable.value = false;
-    FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: '+91' + phoneNo.value,
-      verificationCompleted: (PhoneAuthCredential credential) {},
-      verificationFailed: (FirebaseAuthException e) {},
-      codeSent: (String verificationId, int? resendToken) {
-        firebaseVerificationId = verificationId;
-        isOtpSent.value = true;
-        statusMessage.value = "OTP sent to +91" + phoneNo.value;
-        startResendOtpTimer();
+  Future<void> getOtp() async {
+    try {
+      if (isUserSelected) {
+        // Check if the user's phone number exists in the "user" collection
+        bool isUserAvailable = await isUserExist(phoneNo.value);
+
+        if (isUserAvailable) {
+          // If the user is available, proceed with OTP verification
+          isButtonClickable.value = false;
+          FirebaseAuth.instance.verifyPhoneNumber(
+            phoneNumber: '+91' + phoneNo.value,
+            verificationCompleted: (PhoneAuthCredential credential) {},
+            verificationFailed: (FirebaseAuthException e) {},
+            codeSent: (String verificationId, int? resendToken) {
+              firebaseVerificationId = verificationId;
+              isOtpSent.value = true;
+              statusMessage.value = "OTP sent to +91" + phoneNo.value;
+              startResendOtpTimer();
+              isButtonClickable.value = false;
+              startTimer();
+            },
+            codeAutoRetrievalTimeout: (String verificationId) {},
+          );
+        } else {
+          // If the user is not available, show a snackbar message
+          Get.snackbar(
+            "User Not Found",
+            "Please contact an agent to register.",
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.1),
+            colorText: Colors.red,
+          );
+        }
+      } else if (!isUserSelected) {
+        // Perform the default behavior for agent authentication
         isButtonClickable.value = false;
-        startTimer();
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
+        FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: '+91' + phoneNo.value,
+          verificationCompleted: (PhoneAuthCredential credential) {},
+          verificationFailed: (FirebaseAuthException e) {},
+          codeSent: (String verificationId, int? resendToken) {
+            firebaseVerificationId = verificationId;
+            isOtpSent.value = true;
+            statusMessage.value = "OTP sent to +91" + phoneNo.value;
+            startResendOtpTimer();
+            isButtonClickable.value = false;
+            startTimer();
+          },
+          codeAutoRetrievalTimeout: (String verificationId) {},
+        );
+      }
+    } catch (error) {
+      print("Error while checking user existence: $error");
+    }
+  }
+
+  Future<bool> isUserExist(String phoneNumber) async {
+    try {
+      // Query the "user" collection to check if the phone number exists
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('phoneNumberCollection')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty;
+    } catch (error) {
+      print("Error checking user existence: $error");
+      return false;
+    }
   }
 
   resendOtp() async {
