@@ -1,4 +1,5 @@
 import 'package:finkin_credential/controller/login_controller.dart';
+import 'package:finkin_credential/pages/verification_screen/user_type.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -60,6 +61,12 @@ class VerificationScreen extends StatelessWidget {
               ),
               const SizedBox(
                 height: 10,
+              ),
+              UserTypeSelector(
+                isUserSelected: authController.isUserSelected,
+                onUserTypeChanged: (isSelected) {
+                  authController.setIsUserSelected(isSelected);
+                },
               ),
               Container(
                 decoration: BoxDecoration(

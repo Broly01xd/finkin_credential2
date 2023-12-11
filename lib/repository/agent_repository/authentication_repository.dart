@@ -23,6 +23,6 @@ class AuthenticationRepository extends GetxController {
   void _setInitialScreen(User? user) {
     user == null
         ? Get.offAll(() => const SplashScreen())
-        : Get.offAll(() => const BottomNavBar());
+        : Get.toEnd(() => const BottomNavBar());
   }
 }

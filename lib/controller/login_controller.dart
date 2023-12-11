@@ -16,6 +16,8 @@ import '../repository/loan_repository/loan_repository.dart';
 class LoginController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool isUserSelected = true;
+
   var showPrefix = false.obs;
   var isLogin = true;
   var phoneNo = "".obs;
@@ -41,6 +43,11 @@ class LoginController extends GetxController
   @override
   onInit() async {
     super.onInit();
+  }
+
+  void setIsUserSelected(bool isSelected) {
+    isUserSelected = isSelected;
+    update();
   }
 
   void startTimer() {
@@ -90,6 +97,7 @@ class LoginController extends GetxController
       statusMessageColor = AppColor.textPrimary.obs;
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: firebaseVerificationId, smsCode: otp.value);
+
       await auth.signInWithCredential(credential);
       String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
       agentId = currentUserUid!;

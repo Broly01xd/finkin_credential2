@@ -19,12 +19,19 @@ class LoanModel {
   final String aadharNo;
   final String address;
   final String image;
+  final String income;
+  final String form16img;
+  final String bankImg;
+  final String itReturnImg;
+  final String secondImg;
+  final String monthlyIncome;
+  final bool isGranted;
 
   LoanModel(
       {this.id,
       required this.userId,
-        required this.agentId,
-        required this.agentName,
+      required this.agentId,
+      required this.agentName,
       required this.userName,
       required this.aadharImg,
       required this.panImg,
@@ -36,6 +43,13 @@ class LoanModel {
       required this.aadharNo,
       required this.panNo,
       required this.image,
+      required this.form16img,
+      required this.bankImg,
+      required this.itReturnImg,
+      required this.secondImg,
+      required this.income,
+      required this.monthlyIncome,
+      required this.isGranted,
       this.status = LoanStatus.pending});
 
   toJson() {
@@ -54,7 +68,13 @@ class LoanModel {
       "Address": address,
       "AadharNo": aadharNo,
       "Status": status.name,
-      "Image": image,
+      "isGranted": isGranted,
+      "Form16Img": form16img,
+      "ItReturnImg": itReturnImg,
+      "SecondImg": secondImg,
+      "BankImg": bankImg,
+      "Income": income,
+      "MonthlyIncome": monthlyIncome,
     };
   }
 
@@ -66,6 +86,9 @@ class LoanModel {
       userId: data?["UserId"] ?? "",
       agentId: data?["AgentId"] ?? "",
       userName: data?["UserName"] ?? "",
+      form16img: data?["Form16Img"] ?? "",
+      income: data?["Income"] ?? "",
+      bankImg: data?["BankImg"] ?? "",
       agentName: data?["AgentName"] ?? "",
       phone: data?["Phone"] ?? "",
       email: data?["Email"] ?? "",
@@ -75,9 +98,13 @@ class LoanModel {
       status: _getStatusFromString(data?["Status"]),
       aadharImg: data?['AadharImg'] ?? "",
       panImg: data?['PanImg'] ?? "",
+      monthlyIncome: data?['MonthlyIncome'] ?? "",
       loanType: data?['LoanType'] ?? "",
+      isGranted: data?['isGranted'] ?? false,
       date: (data?['Date'] as Timestamp?)?.toDate() ?? DateTime.now(),
       image: data?['Image'] ?? "",
+      itReturnImg: data?["ItReturnImg"] ?? "",
+      secondImg: data?["SecondImg"] ?? "",
     );
   }
 

@@ -58,6 +58,7 @@ dependencies:
   firebase_core: ^2.23.0
   firebase_auth: ^4.14.1
   firebase_storage: ^11.5.2
+  visibility_detector: ^0.4.0+2
 
   
   
@@ -79,7 +80,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
-  image_path: "assets/images/loan5.jpg"
+  image_path: "assets/images/hil.jpg"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_credential/controller/loan_form_controller.dart';
 import 'package:finkin_credential/controller/login_controller.dart';
 import 'package:finkin_credential/models/loan_model/loan_model.dart';
+import 'package:finkin_credential/pages/home_screen/bottom_nav.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -11,7 +13,6 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../models/agent_model/agent_model.dart';
 import '../../repository/agent_repository/agent_repository.dart';
-import 'companyworker_form.dart';
 
 class LoanForm extends StatefulWidget {
   final String title;
@@ -31,9 +32,15 @@ class _LoanFormState extends State<LoanForm> {
   String imageUrl = '';
   XFile? _pickedFile;
   XFile? _pickedFile2;
+  XFile? _pickedFile3;
+  XFile? _pickedFile4;
+  XFile? _pickedFile5;
+  XFile? _pickedFile6;
   DateTime? selectedDate;
+  bool isVerified = false;
   final LoanFormController loanFormController = Get.find();
   final AgentRepository agentRepository = Get.put(AgentRepository());
+
   get title => widget.title;
 
   Future<void> _selectDate(BuildContext context) async {
@@ -99,6 +106,7 @@ class _LoanFormState extends State<LoanForm> {
                   _buildEmailNumberSection(),
                   _buildPhoneNumberSection(),
                   _buildVerificationCodeSection(),
+                  // _buildANameSection(),
                   _buildDateOfBirthSection(),
                   _buildAddressSection(),
                   _buildPinCodeAndNationalitySection(),
@@ -107,6 +115,7 @@ class _LoanFormState extends State<LoanForm> {
                   _builPanNumberSection(),
                   _buildPANCardUploadSection(),
                   _buildEmployeeTypeSection(),
+                  _buildSubmitButton(),
                 ],
               ),
             ),
@@ -135,6 +144,7 @@ class _LoanFormState extends State<LoanForm> {
             hintText: 'Enter full name as per Aadhar card',
             regexPattern: LoanFormController.nameRegex,
             controller: controller.firstNameController,
+            label2: '',
           ),
         ),
       ],
@@ -149,23 +159,30 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Email',
             regexPattern: LoanFormController.emailRegex,
             controller: controller.emailController,
+            label2: '',
           ),
         ),
       ],
     );
   }
 
-  Widget _buildANameSection() {
-    return const Row(
-      children: [
-        Expanded(
-          child: LabeledTextField(
-            label: 'Agent Name',
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildANameSection() {
+  //   return const ListTile(
+  //     title: TextField(
+  //       decoration: InputDecoration(
+  //         labelStyle: TextStyle(color: Colors.black),
+  //         focusedBorder: OutlineInputBorder(
+  //           borderSide: BorderSide(color: Colors.black),
+  //         ),
+  //         enabledBorder: OutlineInputBorder(
+  //           borderSide: BorderSide(color: Colors.transparent),
+  //         ),
+  //       ),
+  //       style: TextStyle(color: Colors.white),
+  //       cursorColor: Colors.white,
+  //     ),
+  //   );
+  // }
 
   Widget _buildPhoneNumberSection() {
     return Row(
@@ -175,6 +192,7 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Phone Number',
             regexPattern: LoanFormController.phoneNumberRegex,
             controller: controller.phoneNumberController,
+            label2: '',
           ),
         ),
         const SizedBox(width: 10),
@@ -191,6 +209,7 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Enter Your Aadhar Number',
             regexPattern: LoanFormController.aadharCardRegex,
             controller: controller.aadharCardController,
+            label2: '',
           ),
         ),
       ],
@@ -205,6 +224,7 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Enter Your PAN Number',
             regexPattern: LoanFormController.panCardRegex,
             controller: controller.panCardController,
+            label2: '',
           ),
         ),
       ],
@@ -214,9 +234,13 @@ class _LoanFormState extends State<LoanForm> {
   Widget _buildVerificationButton() {
     return ElevatedButton(
       onPressed: () {
-        // setState(() {
-        //   isPhoneNumberVerified = true;
-        // });
+        // Add your verification logic here
+        // Once verification is successful, set isVerified to true
+        setState(() {
+          isVerified = true;
+          loanFormController.updatePermissionGranted(
+              !loanFormController.getPermissionGranted());
+        });
       },
       style: ElevatedButton.styleFrom(
         primary: AppColor.icon,
@@ -224,9 +248,19 @@ class _LoanFormState extends State<LoanForm> {
           borderRadius: BorderRadius.circular(20),
         ),
       ),
-      child: const Text(
-        'Verify',
-        style: TextStyle(color: AppColor.textLight),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (isVerified)
+            const Icon(
+              Icons.check,
+              color: AppColor.textLight,
+            ),
+          Text(
+            isVerified ? 'Verified' : 'Give Access',
+            style: TextStyle(color: AppColor.textLight),
+          ),
+        ],
       ),
     );
   }
@@ -236,33 +270,45 @@ class _LoanFormState extends State<LoanForm> {
       children: [
         Expanded(
           child: LabeledTextField(
-            label: 'Enter Verification Code',
-            regexPattern: LoanFormController.pinCodeRegex,
-            controller: controller.pinCodeController,
+            label: 'Permission Granted',
+            controller: TextEditingController(
+                text: loanFormController.getPermissionGranted().toString()),
+            label2: '',
           ),
         ),
         const SizedBox(width: 10),
-        _buildSubmitButton(),
       ],
     );
   }
 
   Widget _buildSubmitButton() {
-    return ElevatedButton(
-      onPressed: () {
-        if (formKey.currentState!.validate()) {
-          setState(() {});
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        primary: AppColor.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          if (formKey.currentState!.validate()) {
+            Get.snackbar("Submitting", "Submitting the loan form...",
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.green.withOpacity(0.1),
+                colorText: Colors.green);
+            _storeLoanFormData();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BottomNavBar(),
+              ),
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          primary: AppColor.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
-      ),
-      child: const Text(
-        'Submit',
-        style: TextStyle(color: AppColor.textLight),
+        child: const Text(
+          'Submit',
+          style: TextStyle(color: AppColor.textLight),
+        ),
       ),
     );
   }
@@ -281,7 +327,7 @@ class _LoanFormState extends State<LoanForm> {
                   ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
                   : '',
             ),
-            onTap: () => _selectDate(context),
+            onTap: () => _selectDate(context), label2: '',
           ),
         ),
       ],
@@ -295,6 +341,7 @@ class _LoanFormState extends State<LoanForm> {
         label: 'Address',
         regexPattern: LoanFormController.addressRegex,
         controller: controller.addressController,
+        label2: '',
       ),
     );
   }
@@ -307,6 +354,7 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Enter PIN Code',
             regexPattern: LoanFormController.pinCodeRegex,
             controller: controller.pinController,
+            label2: '',
           ),
         ),
         const SizedBox(
@@ -317,6 +365,7 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Nationality',
             regexPattern: LoanFormController.nameRegex,
             controller: controller.nationalityController,
+            label2: '',
           ),
         ),
       ],
@@ -359,6 +408,78 @@ class _LoanFormState extends State<LoanForm> {
     }
   }
 
+  Future<String> _uploadItImgImageToFirestore(XFile pickedFile) async {
+    try {
+      final firebase_storage.Reference storageReference = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('ItImg_images/${DateTime.now().millisecondsSinceEpoch}');
+
+      await storageReference.putFile(File(pickedFile.path));
+
+      String imageUrl = await storageReference.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
+  Future<String> _uploadItImg2ImageToFirestore(XFile pickedFile) async {
+    try {
+      final firebase_storage.Reference storageReference = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('ItImg_images/${DateTime.now().millisecondsSinceEpoch}');
+
+      await storageReference.putFile(File(pickedFile.path));
+
+      String imageUrl = await storageReference.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
+  Future<String> _uploadForm16ImgImageToFirestore(XFile pickedFile) async {
+    try {
+      final firebase_storage.Reference storageReference = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('ItImg_images/${DateTime.now().millisecondsSinceEpoch}');
+
+      await storageReference.putFile(File(pickedFile.path));
+
+      String imageUrl = await storageReference.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
+  Future<String> _uploadBankImgImageToFirestore(XFile pickedFile) async {
+    try {
+      final firebase_storage.Reference storageReference = firebase_storage
+          .FirebaseStorage.instance
+          .ref()
+          .child('ItImg_images/${DateTime.now().millisecondsSinceEpoch}');
+
+      await storageReference.putFile(File(pickedFile.path));
+
+      String imageUrl = await storageReference.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      return '';
+    }
+  }
+
   Widget _buildAadharCardUploadSection() {
     return Row(
       children: [
@@ -377,6 +498,7 @@ class _LoanFormState extends State<LoanForm> {
                 });
               }
             }),
+            label2: '',
           ),
         ),
       ],
@@ -401,6 +523,7 @@ class _LoanFormState extends State<LoanForm> {
                 });
               }
             }),
+            label2: '',
           ),
         ),
       ],
@@ -509,54 +632,184 @@ class _LoanFormState extends State<LoanForm> {
         Row(
           children: [
             Expanded(
-              child: GestureDetector(
-                child:
-                    _buildEmployeeTypeButton('Self Employed', AppColor.primary),
+              child: Row(
+                children: [
+                  Radio(
+                    value: 'Self Employed',
+                    groupValue: controller.employeeType.value,
+                    onChanged: (value) {
+                      setState(() {
+                        controller.employeeType.value = value as String? ?? '';
+                      });
+                    },
+                  ),
+                  Text('Self Employed'),
+                ],
               ),
             ),
             const SizedBox(width: 4),
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const BottomNavBar(),
-                  //   ),
-                  // );
-                },
-                child: _buildCompanyTypeButton(
-                    'Company Worker ', AppColor.primary),
+              child: Row(
+                children: [
+                  Radio(
+                    value: 'Company Worker',
+                    groupValue: controller.employeeType.value,
+                    onChanged: (value) {
+                      setState(() {
+                        controller.employeeType.value = value as String? ?? '';
+                      });
+                    },
+                  ),
+                  Text('Company Worker'),
+                ],
               ),
             ),
-            const SizedBox(height: 80),
           ],
+        ),
+        Visibility(
+          visible: controller.employeeType.value == 'Company Worker',
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              LabeledTextField(
+                label: 'Monthly Income',
+                label2: '',
+                controller: controller.incomeController,
+              ),
+              _buildCompanyUploadSection(),
+              _buildCompanyUpload2Section(),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: controller.employeeType.value == 'Self Employed',
+          child: Column(
+            children: [
+              // Add the widgets you want to display for 'Self Employed'
+              // For example:
+              const SizedBox(height: 20),
+              LabeledTextField(
+                label: 'Monthly Income',
+                label2: '',
+                controller: controller.income2Controller,
+              ),
+              _buildSelfEmployUploadSection(),
+              _buildSelfEmployUpload2Section(),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildEmployeeTypeButton(String text, Color color) {
-    return ElevatedButton(
-      onPressed: () {
-        if (formKey.currentState!.validate()) {
-          Get.snackbar("Submitting", "Submitting the loan form...",
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.green.withOpacity(0.1),
-              colorText: Colors.green);
-          _storeLoanFormData();
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        primary: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+  Widget _buildCompanyUpload2Section() {
+    return Row(
+      children: [
+        Expanded(
+          child: LabeledTextField(
+            label: 'Upload Your Bank Statement (6 Months - 1 Year)',
+            suffixWidget: _buildChooseFileButton(_pickedFile6, () async {
+              final pickedFile6 =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile6 != null) {
+                String imageUrl =
+                    await _uploadBankImgImageToFirestore(pickedFile6);
+
+                loanFormController.updateBankImgImageUrl(imageUrl);
+                setState(() {
+                  _pickedFile6 = pickedFile6;
+                });
+              }
+            }),
+            label2: '',
+          ),
         ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(color: AppColor.textLight),
-      ),
+      ],
+    );
+  }
+
+  Widget _buildCompanyUploadSection() {
+    return Row(
+      children: [
+        SizedBox(
+          height: 10,
+        ),
+        Expanded(
+          child: LabeledTextField(
+            label2: '',
+            label: 'Please Upload Your Form 16',
+            suffixWidget: _buildChooseFileButton(_pickedFile5, () async {
+              final pickedFile5 =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile5 != null) {
+                String imageUrl =
+                    await _uploadForm16ImgImageToFirestore(pickedFile5);
+
+                loanFormController.updateForm16ImgImageUrl(imageUrl);
+                setState(() {
+                  _pickedFile5 = pickedFile5;
+                });
+              }
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+//self employ
+  Widget _buildSelfEmployUploadSection() {
+    return Row(
+      children: [
+        SizedBox(
+          height: 10,
+        ),
+        Expanded(
+          child: LabeledTextField(
+            label2: 'Please Upload IT Return of  2 year',
+            label: 'Please Upload IT Return of  2 year \n First Year',
+            suffixWidget: _buildChooseFileButton(_pickedFile3, () async {
+              final pickedFile3 =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile3 != null) {
+                String imageUrl =
+                    await _uploadItImgImageToFirestore(pickedFile3);
+
+                loanFormController.updateItImgImageUrl(imageUrl);
+                setState(() {
+                  _pickedFile3 = pickedFile3;
+                });
+              }
+            }),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelfEmployUpload2Section() {
+    return Row(
+      children: [
+        Expanded(
+          child: LabeledTextField(
+            label: 'Second Year',
+            suffixWidget: _buildChooseFileButton(_pickedFile4, () async {
+              final pickedFile4 =
+                  await ImagePicker().pickImage(source: ImageSource.gallery);
+              if (pickedFile4 != null) {
+                String imageUrl =
+                    await _uploadItImg2ImageToFirestore(pickedFile4);
+
+                loanFormController.updateItImg2ImageUrl(imageUrl);
+                setState(() {
+                  _pickedFile4 = pickedFile4;
+                });
+              }
+            }),
+            label2: '',
+          ),
+        ),
+      ],
     );
   }
 
@@ -582,9 +835,43 @@ class _LoanFormState extends State<LoanForm> {
         image: loanFormController.image.value,
         date: DateTime.now(),
         agentId: loginController.agentId.value,
+        isGranted: loanFormController.getPermissionGranted(),
+        form16img: loanFormController.form16Img.value,
+        bankImg: loanFormController.bankImg.value,
+        income: controller.incomeController.text.trim(),
+        itReturnImg: loanFormController.itImg.value,
+        secondImg: loanFormController.itImg2.value,
+        monthlyIncome: controller.income2Controller.text.trim(),
+      );
+      await FirebaseFirestore.instance
+          .collection('phoneNumberCollection')
+          .doc(controller.phoneNumberController.text.trim())
+          .set(
+        {
+          'phoneNumber': controller.phoneNumberController.text.trim(),
+        },
+        SetOptions(merge: true),
       );
 
       LoginController.instance.createLoan(loan);
+      setState(() {
+        _pickedFile = null;
+        _pickedFile2 = null;
+        _pickedFile3 = null;
+        _pickedFile4 = null;
+        _pickedFile5 = null;
+        _pickedFile6 = null;
+      });
+      controller.firstNameController.clear();
+      controller.phoneNumberController.clear();
+      controller.emailController.clear();
+      controller.aadharCardController.clear();
+      controller.panCardController.clear();
+      controller.addressController.clear();
+      controller.pinController.clear();
+      controller.nationalityController.clear();
+      controller.incomeController.clear();
+      controller.income2Controller.clear();
     } catch (error) {
       print('Error storing loan data: $error');
       Get.snackbar("Error", "Something went wrong. Try again",
@@ -593,53 +880,12 @@ class _LoanFormState extends State<LoanForm> {
           colorText: Colors.red);
     }
   }
-
-  Widget _buildCompanyTypeButton(String text, Color color) {
-    return ElevatedButton(
-      onPressed: () {
-        if (formKey.currentState!.validate()) {
-          if (_pickedFile == null || _pickedFile2 == null) {
-            const snackBar = SnackBar(
-              content: Text(
-                'Please select both Aadhar Card and PAN Card photos',
-                style: TextStyle(color: AppColor.textLight),
-              ),
-              backgroundColor: AppColor.errorbar,
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          } else {
-            const snackBar = SnackBar(
-              content: Text(
-                'Submitting Form',
-                style: TextStyle(color: AppColor.textLight),
-              ),
-              backgroundColor: AppColor.primary,
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Companyworker()),
-            );
-          }
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        primary: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(color: AppColor.textLight),
-      ),
-    );
-  }
 }
 
 class LabeledTextField extends StatelessWidget {
   final IconData? icon;
   final String label;
+  final String label2;
   final String? hintText;
   final VoidCallback? onTap;
   final Widget? suffixWidget;
@@ -647,9 +893,11 @@ class LabeledTextField extends StatelessWidget {
   final String? regexPattern;
   final Color? iconColor;
   final Color? backgroundColor;
+  final ValueChanged<String>? onChanged;
 
   const LabeledTextField({
     required this.label,
+    required this.label2,
     this.hintText,
     this.onTap,
     this.icon,
@@ -658,6 +906,7 @@ class LabeledTextField extends StatelessWidget {
     this.regexPattern,
     this.iconColor,
     this.backgroundColor,
+    this.onChanged,
   });
 
   @override
@@ -674,6 +923,7 @@ class LabeledTextField extends StatelessWidget {
         const SizedBox(height: 5),
         TextFormField(
           controller: controller,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hintText,
             border: const OutlineInputBorder(),
