@@ -1,3 +1,4 @@
+import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:flutter/material.dart';
 
 class UserTypeSelector extends StatefulWidget {
@@ -30,30 +31,40 @@ class _UserTypeSelectorState extends State<UserTypeSelector> {
       children: [
         Row(
           children: [
-            Checkbox(
-              value: _isUserSelected,
+            Radio(
+              value: true,
+              activeColor: AppColor.primary,
+              groupValue: _isUserSelected,
               onChanged: (value) {
                 setState(() {
-                  _isUserSelected = value ?? false;
+                  _isUserSelected = value as bool;
                 });
                 widget.onUserTypeChanged(_isUserSelected);
               },
             ),
-            Text('User'),
+            const Text(
+              'User',
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
           ],
         ),
         Row(
           children: [
-            Checkbox(
-              value: !_isUserSelected,
+            Radio(
+              value: false,
+              activeColor: AppColor.primary,
+              groupValue: _isUserSelected,
               onChanged: (value) {
                 setState(() {
-                  _isUserSelected = !(value ?? true);
+                  _isUserSelected = value as bool;
                 });
-                widget.onUserTypeChanged(!_isUserSelected);
+                widget.onUserTypeChanged(_isUserSelected);
               },
             ),
-            Text('Agent'),
+            Text(
+              'Agent',
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
           ],
         ),
       ],

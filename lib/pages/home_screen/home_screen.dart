@@ -87,13 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: _getAgentData(id),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const CircularProgressIndicator(
+                      color: AppColor.secondary,
+                    );
                   } else if (snapshot.hasError) {
                     return Text("Error: ${snapshot.error}");
                   } else {
                     String agentName = snapshot.data?[0] ?? "Default Name";
-                    String agentImage =
-                        snapshot.data?[1] ?? "assets/images/default_image.jpg";
+                    String? agentImage = snapshot.data?[1];
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -122,7 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 agentName,
                                 style: const TextStyle(
                                   color: AppColor.textLight,
-                                  // fontWeight: FontWeight.bold,
                                   fontSize: 24,
                                 ),
                               ),
@@ -130,12 +130,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 8,
                               ),
                               Text(
-                                getGreeting()
-                                // + ' Sir'
-                                ,
+                                getGreeting(),
                                 style: const TextStyle(
                                   color: AppColor.textLight,
-                                  //  fontSize: 24,
                                 ),
                               ),
                             ],

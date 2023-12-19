@@ -1,16 +1,20 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_credential/models/agent_model/agent_model.dart';
+import 'package:finkin_credential/models/loan_model/loan_model.dart';
+import 'package:finkin_credential/repository/agent_repository/agent_repository.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:finkin_credential/res/image_asset/image_asset.dart';
 import 'package:finkin_credential/shared/widgets/Account_Tracking_Widget/accout_track.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-//agentform
 import '../../controller/account_controller.dart';
 import '../../controller/login_controller.dart';
 import '../verification_screen/verification_screen.dart';
@@ -26,11 +30,52 @@ class _AccountScreenState extends State<AccountScreen> {
   File? _selectedImage;
   final AccountController accountController = Get.put(AccountController());
   final LoginController loginController = Get.put(LoginController());
+  final AgentRepository agentRepository = Get.put(AgentRepository());
   @override
   void initState() {
     super.initState();
-    String id = loginController.agentId.value;
-    accountController.fetchUserDetails(id);
+    final id = loginController.agentId.value;
+    (loginController.isUserSelected
+        ? accountController.fetchUserDetails
+        : accountController.fetchAgentDetails)(id);
+  }
+
+  Future<void> _uploadImageToFirestore(File imageFile, String agentId) async {
+    try {
+      String imageName = basename(imageFile.path);
+      String storagePath = 'Agents/$agentId/$imageName';
+
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(storagePath);
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+      await _updateFieldInFirestore('ImageUrl', imageUrl, agentId: agentId);
+
+      print('Image uploaded successfully. Image URL: $imageUrl');
+    } catch (e) {
+      print('Error uploading image to Firestore: $e');
+    }
+  }
+
+  Future<void> _uploadUserImageToFirestore(
+      File imageFile, String userId) async {
+    try {
+      String imageName = basename(imageFile.path);
+      String storagePath = 'Loan/$userId/$imageName';
+
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child(storagePath);
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() => null);
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      await _updateUserFieldInFirestore('UserImage', imageUrl, userId: userId);
+
+      print('Image uploaded successfully. Image URL: $imageUrl');
+    } catch (e) {
+      print('Error uploading image to Firestore: $e');
+    }
   }
 
   void _openGallery() async {
@@ -41,7 +86,82 @@ class _AccountScreenState extends State<AccountScreen> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
-      print('Image selected: ${pickedFile.path}');
+      final agentId = loginController.agentId.value;
+      await (loginController.isUserSelected
+          ? _uploadUserImageToFirestore(_selectedImage!, agentId)
+          : _uploadImageToFirestore(_selectedImage!, agentId));
+      print('Image selected and uploaded to Firestore');
+    }
+  }
+
+  Future<String?> getAgentName(String agentId) async {
+    try {
+      print("Fetching agent with ID: $agentId");
+      final AgentModel? agent = await agentRepository.getAgentById(agentId);
+      print("Fetched agent: $agent");
+      return agent?.name;
+    } catch (e) {
+      print('Error fetching agent name: $e');
+      return null;
+    }
+  }
+
+  Future<List<String?>> _getAgentData(String agentId) async {
+    try {
+      String? agentName = await getAgentName(agentId);
+      String? agentImage = await getAgentImage(agentId);
+      return [agentName, agentImage];
+    } catch (e) {
+      print('Error fetching agent data: $e');
+      return ["Default Name", null];
+    }
+  }
+
+  Future<String?> getAgentImage(String agentId) async {
+    try {
+      print("Fetching agent image with ID: $agentId");
+      final AgentModel? agent = await agentRepository.getAgentById(agentId);
+      print("Fetched agent: $agent");
+      return agent?.imageUrl;
+    } catch (e) {
+      print('Error fetching agent image: $e');
+      return null;
+    }
+  }
+
+//user
+  Future<String?> getUserName(String agentId) async {
+    try {
+      print("Fetching agent with ID: $agentId");
+      final LoanModel? loan = await agentRepository.getUserById(agentId);
+      print("Fetched agent: $loan");
+      return loan?.userName;
+    } catch (e) {
+      print('Error fetching agent name: $e');
+      return null;
+    }
+  }
+
+  Future<List<String?>> _getUserData(String agentId) async {
+    try {
+      String? agentName = await getUserName(agentId);
+      String? agentImage = await getUserImage(agentId);
+      return [agentName, agentImage];
+    } catch (e) {
+      print('Error fetching agent data: $e');
+      return ["Default Name", null];
+    }
+  }
+
+  Future<String?> getUserImage(String agentId) async {
+    try {
+      print("Fetching agent image with ID: $agentId");
+      final LoanModel? Loan = await agentRepository.getUserById(agentId);
+      print("Fetched agent: $Loan");
+      return Loan?.userImage;
+    } catch (e) {
+      print('Error fetching agent image: $e');
+      return null;
     }
   }
 
@@ -74,95 +194,118 @@ class _AccountScreenState extends State<AccountScreen> {
                 child: Container(
                   color: AppColor.textLight,
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Stack(
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            GestureDetector(
-                              onTap: _openGallery,
-                              child: Container(
-                                child: _selectedImage != null
-                                    ? CircleAvatar(
-                                        backgroundImage:
-                                            FileImage(_selectedImage!),
-                                        radius: 80,
-                                      )
-                                    : const CircleAvatar(
-                                        backgroundImage:
-                                            AssetImage(ImageAsset.pop),
-                                        radius: 80,
+                    child: FutureBuilder<List<String?>>(
+                        future: loginController.isUserSelected == false
+                            ? _getAgentData(loginController.agentId.value)
+                            : _getUserData(loginController.agentId.value),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError) {
+                            return Text('Error: ${snapshot.error}');
+                          } else {
+                            String agentName =
+                                snapshot.data?[0] ?? "Default Name";
+                            String? agentImage = snapshot.data?[1];
+
+                            return Column(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: _openGallery,
+                                      child: Container(
+                                        child: agentImage != null
+                                            ? CircleAvatar(
+                                                backgroundImage:
+                                                    _selectedImage != null
+                                                        ? FileImage(
+                                                                _selectedImage!)
+                                                            as ImageProvider
+                                                        : NetworkImage(
+                                                            agentImage),
+                                                radius: 80,
+                                              )
+                                            : const CircleAvatar(
+                                                backgroundImage:
+                                                    AssetImage(ImageAsset.pop),
+                                                radius: 80,
+                                              ),
                                       ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: _openGallery,
-                              child: const Padding(
-                                padding: EdgeInsets.all(11.0),
-                                child: Icon(
-                                  Icons.camera_alt_rounded,
-                                  color: Colors.black,
-                                  size: 40.0,
+                                    ),
+                                    GestureDetector(
+                                      onTap: _openGallery,
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(11.0),
+                                        child: Icon(
+                                          Icons.camera_alt_rounded,
+                                          color: Colors.black,
+                                          size: 40.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 25),
-                        const Text(
-                          "User Name Here",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            children: [
-                              Accounttrack(
-                                icon: ImageAsset.user,
-                                text: "My Account",
-                                press: () {
-                                  _showAccountInfoBottomSheet(context);
-                                },
-                              ),
-                              const SizedBox(height: 10),
-                              Accounttrack(
-                                  icon: ImageAsset.settings,
-                                  text: "Settings",
-                                  press: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) =>
-                                    //         const settingPage(),
-                                    //   ),
-                                    // );
-                                  }),
-                              const SizedBox(height: 10),
-                              Accounttrack(
-                                icon: ImageAsset.contact,
-                                text: "Contact Us",
-                                press: () {
-                                  _showContactInfoBottomSheet(context);
-                                },
-                              ),
-                              const SizedBox(height: 10),
-                              Accounttrack(
-                                icon: ImageAsset.logout,
-                                text: "Log Out",
-                                press: () {
-                                  // auth.signOut();
-                                  _showLogoutConfirmationDialog(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                                const SizedBox(height: 25),
+                                Text(
+                                  agentName,
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: Column(
+                                    children: [
+                                      Accounttrack(
+                                        icon: ImageAsset.user,
+                                        text: "My Account",
+                                        press: () {
+                                          _showAccountInfoBottomSheet(context);
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Accounttrack(
+                                          icon: ImageAsset.settings,
+                                          text: "Settings",
+                                          press: () {
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //     builder: (context) =>
+                                            //         const settingPage(),
+                                            //   ),
+                                            // );
+                                          }),
+                                      const SizedBox(height: 10),
+                                      Accounttrack(
+                                        icon: ImageAsset.contact,
+                                        text: "Contact Us",
+                                        press: () {
+                                          _showContactInfoBottomSheet(context);
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Accounttrack(
+                                        icon: ImageAsset.logout,
+                                        text: "Log Out",
+                                        press: () {
+                                          _showLogoutConfirmationDialog(
+                                              context);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        }),
                   ),
                 ),
               ),
@@ -292,9 +435,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       controller: TextEditingController(
                           text: accountController.fullName.value),
                       onChanged: (value) {
-                        // Update the value in the GetX controller
                         accountController.fullName.value = value;
-                        // Update the corresponding field in Firestore
                         _updateFieldInFirestore('Name', value,
                             agentId: loginController.agentId.value);
                       },
@@ -321,9 +462,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       controller: TextEditingController(
                           text: accountController.location.value),
                       onChanged: (value) {
-                        // Update the value in the GetX controller
                         accountController.location.value = value;
-                        // Update the corresponding field in Firestore
                         _updateFieldInFirestore('Address', value,
                             agentId: loginController.agentId.value);
                       },
@@ -347,9 +486,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       controller: TextEditingController(
                           text: accountController.email.value),
                       onChanged: (value) {
-                        // Update the value in the GetX controller
                         accountController.email.value = value;
-                        // Update the corresponding field in Firestore
                         _updateFieldInFirestore('Email', value,
                             agentId: loginController.agentId.value);
                       },
@@ -376,9 +513,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       controller: TextEditingController(
                           text: accountController.aadharCardNumber.value),
                       onChanged: (value) {
-                        // Update the value in the GetX controller
                         accountController.aadharCardNumber.value = value;
-                        // Update the corresponding field in Firestore
                         _updateFieldInFirestore('Aadhar', value,
                             agentId: loginController.agentId.value);
                       },
@@ -692,6 +827,31 @@ class _AccountScreenState extends State<AccountScreen> {
         print("Field $fieldName updated in Firestore for agentId: $agentId");
       } else {
         print("User with agentId $agentId not found");
+      }
+    } catch (e) {
+      print("Error updating field $fieldName in Firestore: $e");
+    }
+  }
+
+  Future<void> _updateUserFieldInFirestore(String fieldName, String value,
+      {required String userId}) async {
+    try {
+      final userQuerySnapshot = await FirebaseFirestore.instance
+          .collection('Loan')
+          .where('UserId', isEqualTo: userId)
+          .get();
+
+      if (userQuerySnapshot.docs.isNotEmpty) {
+        final userDocId = userQuerySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('Loan')
+            .doc(userDocId)
+            .update({
+          fieldName: value,
+        });
+        print("Field $fieldName updated in Firestore for agentId: $userId");
+      } else {
+        print("User with agentId $userId not found");
       }
     } catch (e) {
       print("Error updating field $fieldName in Firestore: $e");

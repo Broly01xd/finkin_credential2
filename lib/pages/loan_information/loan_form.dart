@@ -8,6 +8,7 @@ import 'package:finkin_credential/pages/home_screen/bottom_nav.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -28,7 +29,7 @@ class _LoanFormState extends State<LoanForm> {
   final formKey = GlobalKey<FormState>();
   final LoanFormController controller = Get.put(LoanFormController());
   final LoginController loginController = Get.put(LoginController());
-  File? _selectedImage;
+
   String imageUrl = '';
   XFile? _pickedFile;
   XFile? _pickedFile2;
@@ -101,12 +102,9 @@ class _LoanFormState extends State<LoanForm> {
                 children: [
                   _buildSectionTitle('Personal Information'),
                   const SizedBox(height: 20),
-                  // _buildAgentSection(),
                   _buildNameNumberSection(),
                   _buildEmailNumberSection(),
                   _buildPhoneNumberSection(),
-                  _buildVerificationCodeSection(),
-                  // _buildANameSection(),
                   _buildDateOfBirthSection(),
                   _buildAddressSection(),
                   _buildPinCodeAndNationalitySection(),
@@ -192,11 +190,11 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Phone Number',
             regexPattern: LoanFormController.phoneNumberRegex,
             controller: controller.phoneNumberController,
+            keyboardType: TextInputType.number,
             label2: '',
+            maxLength: 10,
           ),
         ),
-        const SizedBox(width: 10),
-        _buildVerificationButton(),
       ],
     );
   }
@@ -209,7 +207,9 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Enter Your Aadhar Number',
             regexPattern: LoanFormController.aadharCardRegex,
             controller: controller.aadharCardController,
+            keyboardType: TextInputType.number,
             label2: '',
+            maxLength: 12,
           ),
         ),
       ],
@@ -227,56 +227,6 @@ class _LoanFormState extends State<LoanForm> {
             label2: '',
           ),
         ),
-      ],
-    );
-  }
-
-  Widget _buildVerificationButton() {
-    return ElevatedButton(
-      onPressed: () {
-        // Add your verification logic here
-        // Once verification is successful, set isVerified to true
-        setState(() {
-          isVerified = true;
-          loanFormController.updatePermissionGranted(
-              !loanFormController.getPermissionGranted());
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        primary: AppColor.icon,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (isVerified)
-            const Icon(
-              Icons.check,
-              color: AppColor.textLight,
-            ),
-          Text(
-            isVerified ? 'Verified' : 'Give Access',
-            style: TextStyle(color: AppColor.textLight),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVerificationCodeSection() {
-    return Row(
-      children: [
-        Expanded(
-          child: LabeledTextField(
-            label: 'Permission Granted',
-            controller: TextEditingController(
-                text: loanFormController.getPermissionGranted().toString()),
-            label2: '',
-          ),
-        ),
-        const SizedBox(width: 10),
       ],
     );
   }
@@ -354,6 +304,8 @@ class _LoanFormState extends State<LoanForm> {
             label: 'Enter PIN Code',
             regexPattern: LoanFormController.pinCodeRegex,
             controller: controller.pinController,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
             label2: '',
           ),
         ),
@@ -636,6 +588,7 @@ class _LoanFormState extends State<LoanForm> {
                 children: [
                   Radio(
                     value: 'Self Employed',
+                    activeColor: AppColor.primary,
                     groupValue: controller.employeeType.value,
                     onChanged: (value) {
                       setState(() {
@@ -643,7 +596,7 @@ class _LoanFormState extends State<LoanForm> {
                       });
                     },
                   ),
-                  Text('Self Employed'),
+                  const Text('Self Employed'),
                 ],
               ),
             ),
@@ -653,6 +606,7 @@ class _LoanFormState extends State<LoanForm> {
                 children: [
                   Radio(
                     value: 'Company Worker',
+                    activeColor: AppColor.primary,
                     groupValue: controller.employeeType.value,
                     onChanged: (value) {
                       setState(() {
@@ -660,7 +614,7 @@ class _LoanFormState extends State<LoanForm> {
                       });
                     },
                   ),
-                  Text('Company Worker'),
+                  const Text('Company Worker'),
                 ],
               ),
             ),
@@ -675,6 +629,7 @@ class _LoanFormState extends State<LoanForm> {
                 label: 'Monthly Income',
                 label2: '',
                 controller: controller.incomeController,
+                keyboardType: TextInputType.number,
               ),
               _buildCompanyUploadSection(),
               _buildCompanyUpload2Section(),
@@ -692,6 +647,7 @@ class _LoanFormState extends State<LoanForm> {
                 label: 'Monthly Income',
                 label2: '',
                 controller: controller.income2Controller,
+                keyboardType: TextInputType.number,
               ),
               _buildSelfEmployUploadSection(),
               _buildSelfEmployUpload2Section(),
@@ -842,6 +798,7 @@ class _LoanFormState extends State<LoanForm> {
         itReturnImg: loanFormController.itImg.value,
         secondImg: loanFormController.itImg2.value,
         monthlyIncome: controller.income2Controller.text.trim(),
+        userImage: '',
       );
       await FirebaseFirestore.instance
           .collection('phoneNumberCollection')
@@ -893,6 +850,8 @@ class LabeledTextField extends StatelessWidget {
   final String? regexPattern;
   final Color? iconColor;
   final Color? backgroundColor;
+  final TextInputType? keyboardType;
+  final int? maxLength;
   final ValueChanged<String>? onChanged;
 
   const LabeledTextField({
@@ -907,6 +866,8 @@ class LabeledTextField extends StatelessWidget {
     this.iconColor,
     this.backgroundColor,
     this.onChanged,
+    this.keyboardType,
+    this.maxLength,
   });
 
   @override
@@ -924,6 +885,11 @@ class LabeledTextField extends StatelessWidget {
         TextFormField(
           controller: controller,
           onChanged: onChanged,
+          keyboardType: keyboardType,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(
+                maxLength), // Set the maximum length
+          ],
           decoration: InputDecoration(
             hintText: hintText,
             border: const OutlineInputBorder(),

@@ -8,19 +8,25 @@ class UserInfoController extends GetxController {
   var dob = ''.obs;
   var address = ''.obs;
   var imageUrl = ''.obs;
+  var userImage = ''.obs;
   var userid = ''.obs;
   var status = ''.obs;
+  var agentImg = ''.obs;
+  var aadharImg = ''.obs;
+  var panImg = ''.obs;
+  var secondImg = ''.obs;
+  var itReturnImg = ''.obs;
   var currentStep = 1.obs;
   var isLoading = true.obs;
 
-  Future<void> fetchUserDetails(String agentId) async {
+  Future<void> fetchUserDetails(String docId) async {
     try {
       isLoading(true);
-      print("Fetching user details for agentId: $agentId");
+      print("Fetching user details for agentId: $docId");
 
       final querySnapshot = await FirebaseFirestore.instance
           .collection('Loan')
-          .where('AgentId', isEqualTo: agentId)
+          .where('docId', isEqualTo: docId)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -33,8 +39,51 @@ class UserInfoController extends GetxController {
         userid.value = userDoc['AgentId'] ?? '';
         imageUrl.value = userDoc['AadharImg'] ?? '';
         status.value = userDoc['Status'] ?? '';
+        aadharImg.value = userDoc['AadharImg'] ?? '';
+        panImg.value = userDoc['PanImg'] ?? '';
+        itReturnImg.value = userDoc['ItReturnImg'] ?? '';
+        secondImg.value = userDoc['SecondImg'] ?? '';
+        userImage.value = userDoc['UserImage'] ?? '';
+
         _updateCurrentStep(status.value);
-        // dob.value = userDoc['Date'] ?? '';
+      } else {
+        print("User with agentId $docId not found");
+      }
+    } catch (e) {
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // void clearControllerValues() {
+  //   address.value = '';
+  //   fullName.value = '';
+  //   email.value = '';
+  //   phone.value = '';
+  //   userid.value = '';
+  //   imageUrl.value = '';
+  //   status.value = '';
+  //   aadharImg.value = '';
+  //   panImg.value = '';
+  //   itReturnImg.value = '';
+  //   secondImg.value = '';
+  // }
+
+  Future<void> fetchAgentDetails(String agentId) async {
+    try {
+      isLoading(true);
+      print("Fetching user details for agentId: $agentId");
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('Agents')
+          .where('AgentId', isEqualTo: agentId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final userDoc = querySnapshot.docs.first.data();
+        print("User details fetched successfully: $userDoc");
+
+        agentImg.value = userDoc['ImageUrl'] ?? '';
       } else {
         print("User with agentId $agentId not found");
       }
@@ -57,7 +106,7 @@ class UserInfoController extends GetxController {
         currentStep.value = 5;
         break;
       default:
-        currentStep.value = 1; // Default to the first step
+        currentStep.value = 1;
     }
   }
 }

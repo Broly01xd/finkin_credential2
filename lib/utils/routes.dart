@@ -68,7 +68,10 @@ class MyRoutes {
       case '/navBAr':
         return MaterialPageRoute(builder: (context) => const BottomNavBar());
       case '/infodisplay':
-        return MaterialPageRoute(builder: (context) => const InfoDisplay());
+        return MaterialPageRoute(
+            builder: (context) => const InfoDisplay(
+                  documentId: '',
+                ));
       case '/loanform':
         if (args is String) {
           return MaterialPageRoute(

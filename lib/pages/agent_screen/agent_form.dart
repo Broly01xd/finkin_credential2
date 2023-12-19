@@ -5,12 +5,12 @@ import 'package:finkin_credential/models/agent_model/agent_model.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../controller/login_controller.dart';
 
-//agentform
 class AgentForm extends StatefulWidget {
   const AgentForm({Key? key, required String agentId}) : super(key: key);
 
@@ -19,12 +19,10 @@ class AgentForm extends StatefulWidget {
 }
 
 class _AgentFormState extends State<AgentForm> {
-  File? image;
+  File? _selectedImage;
   final formKey = GlobalKey<FormState>();
   final AgentFormController controller = Get.put(AgentFormController());
   final LoginController loginController = Get.put(LoginController());
-  File? _selectedImage;
-  String imageUrl = '';
   bool isImageUploaded = false;
   String imageValidationError = '';
   final AgentFormController agentFormController = Get.find();
@@ -123,8 +121,9 @@ class _AgentFormState extends State<AgentForm> {
                           child: CircleAvatar(
                             backgroundImage: (_selectedImage != null
                                     ? FileImage(_selectedImage!)
-                                    : (imageUrl.isNotEmpty
-                                        ? NetworkImage(imageUrl)
+                                    : (agentFormController.imageUrl.isNotEmpty
+                                        ? NetworkImage(
+                                            agentFormController.imageUrl.value)
                                         : const AssetImage(
                                             'assets/images/image.png')))
                                 as ImageProvider<Object>?,
@@ -161,6 +160,16 @@ class _AgentFormState extends State<AgentForm> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
+                  height: 10,
+                ),
+                LabeledTextField(
+                  label: 'Agent Type',
+                  hintText: 'Agent Type',
+                  controller: TextEditingController(
+                    text: agentFormController.selectedAgentType.value,
+                  ),
+                ),
+                const SizedBox(
                   height: 5,
                 ),
                 LabeledTextField(
@@ -186,6 +195,8 @@ class _AgentFormState extends State<AgentForm> {
                   hintText: 'Enter Phone Number',
                   regexPattern: AgentFormController.phoneNumberRegex,
                   controller: controller.phoneNumberController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
                 ),
                 const SizedBox(
                   height: 5,
@@ -195,6 +206,8 @@ class _AgentFormState extends State<AgentForm> {
                   hintText: 'Enter Your Aadhar card Number',
                   regexPattern: AgentFormController.aadharCardRegex,
                   controller: controller.aadharCardController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 12,
                 ),
                 const SizedBox(
                   height: 10,
@@ -223,16 +236,6 @@ class _AgentFormState extends State<AgentForm> {
                   regexPattern: AgentFormController.addressRegex,
                   controller: controller.addressController,
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                LabeledTextField(
-                  label: 'Agent Type',
-                  hintText: 'Agent Type',
-                  controller: TextEditingController(
-                    text: agentFormController.selectedAgentType.value,
-                  ),
-                ),
                 SizedBox(
                   height: height * 0.05,
                 ),
@@ -250,16 +253,16 @@ class _AgentFormState extends State<AgentForm> {
                       onPressed: () async {
                         if (!isButtonPressed) {
                           bool isFormValidated = isFormValid();
-                          if (isFormValidated) {
-                            isButtonPressed =
-                                true; // Set the flag to true on first press
+                          bool isImageSelected = _selectedImage != null;
+
+                          if (isFormValidated && isImageSelected) {
+                            isButtonPressed = true;
                             setState(() {});
 
                             bool isImageUploadSuccessful =
                                 await uploadImageToFirebase();
 
-                            if (formKey.currentState!.validate() &&
-                                isImageUploadSuccessful) {
+                            if (isImageUploadSuccessful) {
                               const snackBar = SnackBar(
                                 content: Text(
                                   'Submitting Form',
@@ -291,17 +294,27 @@ class _AgentFormState extends State<AgentForm> {
 
                               LoginController.instance.createAgent(agent);
                             } else {
-                              if (imageValidationError.isNotEmpty) {
-                                SnackBar snackBar = const SnackBar(
-                                  content: Text(
-                                    'Please Choose Image',
-                                    style: TextStyle(color: AppColor.textLight),
-                                  ),
-                                  backgroundColor: Colors.red,
-                                );
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
-                              }
+                              SnackBar snackBar = const SnackBar(
+                                content: Text(
+                                  'Error uploading image. Please try again.',
+                                  style: TextStyle(color: AppColor.textLight),
+                                ),
+                                backgroundColor: Colors.red,
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
+                            }
+                          } else {
+                            if (!isImageSelected) {
+                              SnackBar snackBar = const SnackBar(
+                                content: Text(
+                                  'Please Choose Image',
+                                  style: TextStyle(color: AppColor.textLight),
+                                ),
+                                backgroundColor: Colors.red,
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
                             }
                           }
                         }
@@ -326,6 +339,9 @@ class LabeledTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget? suffixWidget;
   final TextEditingController? controller;
+  // final TextInputType? keyboardType5;
+  final TextInputType? keyboardType;
+  final int? maxLength;
   final String? regexPattern;
 
   const LabeledTextField({
@@ -336,6 +352,9 @@ class LabeledTextField extends StatelessWidget {
     this.suffixWidget,
     this.controller,
     this.regexPattern,
+    //  this.keyboardType5,
+    this.keyboardType,
+    this.maxLength,
   });
 
   @override
@@ -353,6 +372,11 @@ class LabeledTextField extends StatelessWidget {
         TextFormField(
           controller: controller,
           readOnly: label == 'Agent Type',
+          keyboardType: keyboardType,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(
+                maxLength), // Set the maximum length
+          ],
           decoration: InputDecoration(
             hintText: hintText,
             border: const OutlineInputBorder(),

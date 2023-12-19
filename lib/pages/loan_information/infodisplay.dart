@@ -7,7 +7,8 @@ import '../../controller/info_controller.dart';
 import '../../controller/login_controller.dart';
 
 class InfoDisplay extends StatefulWidget {
-  const InfoDisplay({Key? key}) : super(key: key);
+  final String documentId;
+  const InfoDisplay({Key? key, required this.documentId}) : super(key: key);
 
   @override
   State<InfoDisplay> createState() => _InfoDisplayState();
@@ -23,9 +24,8 @@ class _InfoDisplayState extends State<InfoDisplay> {
   void initState() {
     super.initState();
     String id = loginController.agentId.value;
-    // Fetch user details when the screen is initialized
-    userInfoController.fetchUserDetails(id);
-    // Update the UI by calling setState
+    userInfoController.fetchUserDetails(widget.documentId);
+    userInfoController.fetchAgentDetails(id);
 
     print("Image URL: ${userInfoController.userid.value}");
   }
@@ -35,10 +35,49 @@ class _InfoDisplayState extends State<InfoDisplay> {
       return NetworkImage(imageUrl);
     } catch (e) {
       print("Error loading image: $e");
-      // You can return a placeholder image or handle the error in a way that fits your application.
-      // For example, return AssetImage('path/to/placeholder_image.jpg') or an empty AssetImage.
-      return AssetImage('assets/images/contact.svg');
+
+      return const AssetImage('assets/images/contact.svg');
     }
+  }
+
+  void _showImageDialog(String ImageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.network(
+                  ImageUrl,
+                  height: 500,
+                  width: 500,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: AppColor.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(color: AppColor.textLight),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -46,10 +85,11 @@ class _InfoDisplayState extends State<InfoDisplay> {
     return Scaffold(
       body: Obx(() {
         if (userInfoController.isLoading.value) {
-          // Show a loading indicator while data is being fetched
-          return Center(child: CircularProgressIndicator());
+          return const Center(
+              child: CircularProgressIndicator(
+            color: AppColor.primary,
+          ));
         } else {
-          // Continue with your existing UI code
           return CustomScrollView(
             slivers: [
               const SliverAppBar(
@@ -75,9 +115,10 @@ class _InfoDisplayState extends State<InfoDisplay> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 InkWell(
+                                  onTap: () {},
                                   child: CircleAvatar(
                                     backgroundImage: _buildImageProvider(
-                                        userInfoController.imageUrl.value),
+                                        userInfoController.userImage.value),
                                     radius: 50,
                                     backgroundColor: AppColor.secondary,
                                   ),
@@ -85,7 +126,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                 const SizedBox(height: 10),
                                 Text(
                                   userInfoController.fullName.value,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 25,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -93,7 +134,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                 const SizedBox(height: 10),
                                 Text(
                                   "USER-${userInfoController.userid.value}",
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: AppColor.textdivider,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -158,53 +199,51 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                Container(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            isPersonalDetailsSelected = true;
-                                          });
-                                        },
-                                        style: TextButton.styleFrom(
-                                          fixedSize: const Size(140, 60),
-                                          backgroundColor:
-                                              isPersonalDetailsSelected
-                                                  ? AppColor.primary
-                                                  : AppColor.subtext,
-                                        ),
-                                        child: const Text(
-                                          'Personal Details',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: AppColor.textLight),
-                                        ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isPersonalDetailsSelected = true;
+                                        });
+                                      },
+                                      style: TextButton.styleFrom(
+                                        fixedSize: const Size(140, 60),
+                                        backgroundColor:
+                                            isPersonalDetailsSelected
+                                                ? AppColor.primary
+                                                : AppColor.subtext,
                                       ),
-                                      SizedBox(width: 16),
-                                      TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            isPersonalDetailsSelected = false;
-                                          });
-                                        },
-                                        style: TextButton.styleFrom(
-                                          fixedSize: const Size(140, 60),
-                                          backgroundColor:
-                                              isPersonalDetailsSelected
-                                                  ? AppColor.subtext
-                                                  : AppColor.primary,
-                                        ),
-                                        child: const Text(
-                                          'Other Details',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: AppColor.textLight),
-                                        ),
+                                      child: const Text(
+                                        'Personal Details',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColor.textLight),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isPersonalDetailsSelected = false;
+                                        });
+                                      },
+                                      style: TextButton.styleFrom(
+                                        fixedSize: const Size(140, 60),
+                                        backgroundColor:
+                                            isPersonalDetailsSelected
+                                                ? AppColor.subtext
+                                                : AppColor.primary,
+                                      ),
+                                      child: const Text(
+                                        'Other Details',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: AppColor.textLight),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -221,25 +260,25 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                         hintText:
                                             userInfoController.fullName.value,
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       LabeledTextField2(
                                         label: 'Email',
                                         hintText:
                                             userInfoController.email.value,
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       LabeledTextField2(
                                         label: 'Phone ',
                                         hintText:
                                             userInfoController.phone.value,
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       LabeledTextField2(
                                         label: 'Date Of Birth ',
                                         hintText:
                                             userInfoController.phone.value,
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       LabeledTextField2(
                                         label: 'Address',
                                         hintText:
@@ -277,7 +316,11 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                             ),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _showImageDialog(
+                                                  userInfoController
+                                                      .aadharImg.value);
+                                            },
                                             style: ElevatedButton.styleFrom(
                                               fixedSize: const Size(90, 46),
                                               primary: AppColor.primary,
@@ -316,7 +359,11 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                             ),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _showImageDialog(
+                                                  userInfoController
+                                                      .panImg.value);
+                                            },
                                             style: ElevatedButton.styleFrom(
                                               fixedSize: const Size(90, 46),
                                               primary: AppColor.primary,
@@ -363,7 +410,11 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                             ),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _showImageDialog(
+                                                  userInfoController
+                                                      .itReturnImg.value);
+                                            },
                                             style: ElevatedButton.styleFrom(
                                               fixedSize: Size(90, 46),
                                               primary: AppColor.primary,
@@ -397,7 +448,11 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                             ),
                                           ),
                                           ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              _showImageDialog(
+                                                  userInfoController
+                                                      .secondImg.value);
+                                            },
                                             style: ElevatedButton.styleFrom(
                                               fixedSize: const Size(90, 46),
                                               primary: AppColor.primary,

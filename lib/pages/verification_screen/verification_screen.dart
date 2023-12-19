@@ -74,100 +74,100 @@ class VerificationScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Obx(() => Column(
-                      children: [
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          maxLength: 10,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          onChanged: (val) {
-                            authController.phoneNo.value = val;
-                            authController.showPrefix.value = val.length > 0;
-                          },
-                          onSaved: (val) => authController.phoneNo.value = val!,
-                          validator: (val) => (val!.isEmpty || val.length < 10)
-                              ? "Enter a valid number"
-                              : null,
-                          decoration: InputDecoration(
-                            hintText: "Mobile Number",
-                            labelText: "Mobile Number",
-                            hintStyle:
-                                const TextStyle(color: AppColor.textdivider),
-                            labelStyle:
-                                const TextStyle(color: AppColor.primary),
-                            floatingLabelBehavior: FloatingLabelBehavior.auto,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Colors.black12),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  const BorderSide(color: Colors.black12),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            prefix: authController.showPrefix.value
-                                ? const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8),
-                                    child: Text(
-                                      '(+91)',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                : null,
-                            suffixIcon: _buildSuffixIcon(),
-                          ),
-                          cursorColor: AppColor.textPrimary,
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      maxLength: 10,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      onChanged: (val) {
+                        authController.phoneNo.value = val;
+                        authController.showPrefix.value = val.length > 0;
+                      },
+                      onSaved: (val) => authController.phoneNo.value = val!,
+                      validator: (val) => (val!.isEmpty || val.length < 10)
+                          ? "Enter a valid number"
+                          : null,
+                      decoration: InputDecoration(
+                        hintText: "Mobile Number",
+                        labelText: "Mobile Number",
+                        hintStyle:
+                        const TextStyle(color: AppColor.textdivider),
+                        labelStyle:
+                        const TextStyle(color: AppColor.primary),
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                          const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        const SizedBox(
-                          height: 22,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                          const BorderSide(color: Colors.black12),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        ElevatedButton(
-                          onPressed: authController.isButtonClickable.value
-                              ? () async {
-                                  final form = _formKey.currentState;
-                                  if (form!.validate()) {
-                                    form.save();
-                                    await authController.getOtp();
+                        prefix: authController.showPrefix.value
+                            ? const Padding(
+                          padding:
+                          EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            '(+91)',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        )
+                            : null,
+                        suffixIcon: _buildSuffixIcon(),
+                      ),
+                      cursorColor: AppColor.textPrimary,
+                    ),
+                    const SizedBox(
+                      height: 22,
+                    ),
+                    ElevatedButton(
+                      onPressed: authController.isButtonClickable.value
+                          ? () async {
+                        final form = _formKey.currentState;
+                        if (form!.validate()) {
+                          form.save();
+                          await authController.getOtp();
 
-                                    // Display the message on the same page
-                                    authController.statusMessage.value =
-                                        "Sending..... OTP to +91${authController.phoneNo.value}.";
-                                    authController.statusMessageColor.value =
-                                        AppColor.textPrimary;
-                                  }
-                                }
-                              : null,
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: AppColor.textLight,
-                            backgroundColor:
-                                authController.isButtonClickable.value
-                                    ? AppColor.primary
-                                    : AppColor.textLight,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24.0),
-                            ),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(14.0),
-                            child: Text(
-                              'Get OTP',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
+                          // Display the message on the same page
+                          authController.statusMessage.value =
+                          "Sending..... OTP to +91${authController.phoneNo.value}.";
+                          authController.statusMessageColor.value =
+                              AppColor.textPrimary;
+                        }
+                      }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: AppColor.textLight,
+                        backgroundColor:
+                        authController.isButtonClickable.value
+                            ? AppColor.primary
+                            : AppColor.textLight,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24.0),
                         ),
-                      ],
-                    )),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(14.0),
+                        child: Text(
+                          'Get OTP',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
               ),
               const SizedBox(height: 10),
               Obx(
-                () => Center(
+                    () => Center(
                   child: Text(
                     authController.statusMessage.value,
                     style: TextStyle(
@@ -311,9 +311,9 @@ class VerificationScreen extends StatelessWidget {
                         foregroundColor: MaterialStateProperty.all<Color>(
                             AppColor.textLight),
                         backgroundColor:
-                            MaterialStateProperty.all<Color>(AppColor.primary),
+                        MaterialStateProperty.all<Color>(AppColor.primary),
                         shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                        MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24.0),
                           ),
@@ -346,7 +346,7 @@ class VerificationScreen extends StatelessWidget {
               height: 18,
             ),
             Obx(
-              () => TextButton(
+                  () => TextButton(
                 onPressed: () => authController.resendOTP.value
                     ? authController.resendOtp()
                     : null,
@@ -402,7 +402,7 @@ class VerificationScreen extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             contentPadding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             counter: const Offstage(),
             enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(width: 2, color: AppColor.primary),

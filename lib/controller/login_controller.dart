@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 
 import '../models/agent_model/agent_model.dart';
 import '../pages/home_screen/bottom_nav.dart';
+import '../pages/verification_screen/user_screen.dart';
 import '../repository/agent_repository/agent_repository.dart';
 import '../repository/loan_repository/loan_repository.dart';
 
@@ -29,6 +30,7 @@ class LoginController extends GetxController
   var statusMessage = "".obs;
   var statusMessageColor = Colors.black.obs;
   var isButtonClickable = true.obs;
+
   Timer? _timer;
   static LoginController get instance => Get.find();
   final agentRepo = Get.put(AgentRepository());
@@ -40,18 +42,13 @@ class LoginController extends GetxController
     initAuthListener();
   }
 
-  @override
-  onInit() async {
-    super.onInit();
-  }
-
   void setIsUserSelected(bool isSelected) {
     isUserSelected = isSelected;
     update();
   }
 
   void startTimer() {
-    _timer = Timer(Duration(seconds: 30), () {
+    _timer = Timer(const Duration(seconds: 30), () {
       isButtonClickable.value = true;
     });
   }
@@ -59,20 +56,18 @@ class LoginController extends GetxController
   Future<void> getOtp() async {
     try {
       if (isUserSelected) {
-        // Check if the user's phone number exists in the "user" collection
         bool isUserAvailable = await isUserExist(phoneNo.value);
 
         if (isUserAvailable) {
-          // If the user is available, proceed with OTP verification
           isButtonClickable.value = false;
           FirebaseAuth.instance.verifyPhoneNumber(
-            phoneNumber: '+91' + phoneNo.value,
+            phoneNumber: '+91${phoneNo.value}',
             verificationCompleted: (PhoneAuthCredential credential) {},
             verificationFailed: (FirebaseAuthException e) {},
             codeSent: (String verificationId, int? resendToken) {
               firebaseVerificationId = verificationId;
               isOtpSent.value = true;
-              statusMessage.value = "OTP sent to +91" + phoneNo.value;
+              statusMessage.value = "OTP sent to +91${phoneNo.value}";
               startResendOtpTimer();
               isButtonClickable.value = false;
               startTimer();
@@ -80,26 +75,25 @@ class LoginController extends GetxController
             codeAutoRetrievalTimeout: (String verificationId) {},
           );
         } else {
-          // If the user is not available, show a snackbar message
           Get.snackbar(
             "User Not Found",
             "Please contact an agent to register.",
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red.withOpacity(0.1),
-            colorText: Colors.red,
+            backgroundColor: AppColor.errorbar.withOpacity(0.1),
+            colorText: AppColor.errorbar,
           );
         }
       } else if (!isUserSelected) {
-        // Perform the default behavior for agent authentication
         isButtonClickable.value = false;
         FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: '+91' + phoneNo.value,
+          phoneNumber: '+91${phoneNo.value}',
           verificationCompleted: (PhoneAuthCredential credential) {},
           verificationFailed: (FirebaseAuthException e) {},
           codeSent: (String verificationId, int? resendToken) {
             firebaseVerificationId = verificationId;
             isOtpSent.value = true;
-            statusMessage.value = "OTP sent to +91" + phoneNo.value;
+            //  statusMessage.value = "OTP sent to +91" + phoneNo.value;
+            statusMessage.value = "OTP sent to +91${phoneNo.value}";
             startResendOtpTimer();
             isButtonClickable.value = false;
             startTimer();
@@ -114,7 +108,6 @@ class LoginController extends GetxController
 
   Future<bool> isUserExist(String phoneNumber) async {
     try {
-      // Query the "user" collection to check if the phone number exists
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('phoneNumberCollection')
           .where('phoneNumber', isEqualTo: phoneNumber)
@@ -154,18 +147,34 @@ class LoginController extends GetxController
       await auth.signInWithCredential(credential);
       String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
       agentId = currentUserUid!;
-      bool isFormFilled = await agentRepo.isAgentFormFilled(agentId);
-      print(isFormFilled);
-      print(agentId);
+      bool isUserAvailable = await isUserExist(phoneNo.value);
 
-      if (isFormFilled) {
-        Get.to(() => const BottomNavBar(initialIndex: 0));
+      if (isUserAvailable) {
+        await updateLoanDocument(currentUserUid);
+
+        Get.to(() => const UserScreen());
       } else {
-        Get.to(() => const AgentPage());
+        bool isFormFilled = await agentRepo.isAgentFormFilled(agentId);
+
+        if (isFormFilled) {
+          Get.to(() => const BottomNavBar(initialIndex: 0));
+        } else {
+          Get.to(() => const AgentPage());
+        }
       }
     } catch (e) {
-      statusMessage.value = "Invalid  OTP";
+      statusMessage.value = "Invalid OTP";
       statusMessageColor = AppColor.textPrimary.obs;
+    } finally {
+      isOtpSent.value = false;
+      if (_timer != null && _timer!.isActive) {
+        _timer!.cancel();
+      }
+      if (timer != null && timer.isActive) {
+        timer.cancel();
+      }
+      resendAfter.value = 30;
+      isButtonClickable.value = true;
     }
   }
 
@@ -187,7 +196,7 @@ class LoginController extends GetxController
   }
 
   startResendOtpTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (resendAfter.value != 0) {
         resendAfter.value--;
       } else {
@@ -224,9 +233,30 @@ class LoginController extends GetxController
         "Error",
         "Something went wrong while creating the loan. Please try again.",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.1),
-        colorText: Colors.red,
+        backgroundColor: AppColor.errorbar.withOpacity(0.1),
+        colorText: AppColor.errorbar,
       );
+    }
+  }
+
+  Future<void> updateLoanDocument(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Loan')
+          .where('Phone', isEqualTo: phoneNo.value)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String documentId = querySnapshot.docs.first.id;
+        await FirebaseFirestore.instance
+            .collection('Loan')
+            .doc(documentId)
+            .update({
+          'UserId': userId,
+        });
+      }
+    } catch (error) {
+      print("Error updating Loan document: $error");
     }
   }
 

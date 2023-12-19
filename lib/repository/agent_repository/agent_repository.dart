@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../models/agent_model/agent_model.dart';
+import '../../models/loan_model/loan_model.dart';
 
 class AgentRepository extends GetxController {
   static AgentRepository get instance => Get.find();
@@ -77,6 +78,27 @@ class AgentRepository extends GetxController {
         DocumentSnapshot<Map<String, dynamic>> document =
             querySnapshot.docs.first;
         return AgentModel.fromSnapshot(document);
+      } else {
+        print("Document does not exist.");
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching agent data: $e');
+      return null;
+    }
+  }
+
+  Future<LoanModel?> getUserById(String userId) async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
+          .collection('Loan')
+          .where('UserId', isEqualTo: userId)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot<Map<String, dynamic>> document =
+            querySnapshot.docs.first;
+        return LoanModel.fromSnapshot(document);
       } else {
         print("Document does not exist.");
         return null;

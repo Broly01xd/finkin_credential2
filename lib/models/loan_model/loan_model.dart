@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class LoanModel {
   final String? id;
+  final String userImage;
   final String userId;
   final String agentId;
   final String agentName;
@@ -31,6 +32,7 @@ class LoanModel {
       {this.id,
       required this.userId,
       required this.agentId,
+      required this.userImage,
       required this.agentName,
       required this.userName,
       required this.aadharImg,
@@ -59,6 +61,7 @@ class LoanModel {
       "UserName": userName,
       "AgentName": agentName,
       "AadharImg": aadharImg,
+      "UserImage": userImage,
       "Email": email,
       "LoanType": loanType,
       "Date": date,
@@ -84,6 +87,7 @@ class LoanModel {
     return LoanModel(
       id: document.id,
       userId: data?["UserId"] ?? "",
+      userImage: data?["UserImage"] ?? "",
       agentId: data?["AgentId"] ?? "",
       userName: data?["UserName"] ?? "",
       form16img: data?["Form16Img"] ?? "",

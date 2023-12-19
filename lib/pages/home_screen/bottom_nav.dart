@@ -1,4 +1,5 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:finkin_credential/controller/login_controller.dart';
 import 'package:finkin_credential/pages/home_screen/account_screen.dart';
 import 'package:finkin_credential/pages/home_screen/home_screen.dart';
 import 'package:finkin_credential/pages/home_screen/loan_screen.dart';
@@ -6,6 +7,7 @@ import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:finkin_credential/res/constants/enums/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int initialIndex;
@@ -20,7 +22,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   late PageController _pageController;
   late int _currentIndex;
   late List<Widget> _screens;
-
+  final LoginController loginController = Get.put(LoginController());
   @override
   void initState() {
     super.initState();
@@ -28,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     _pageController = PageController(initialPage: _currentIndex);
 
     _screens = [
-      HomeScreen(),
+      if (loginController.isUserSelected == false) HomeScreen(),
       const LoanScreen(
         title: 'Loan Tracking',
       ),
@@ -77,12 +79,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
           height: 50,
           color: AppColor.primary,
           index: _currentIndex,
-          items: const [
-            Icon(
-              Icons.home,
-              color: AppColor.textLight,
-              size: 30,
-            ),
+          items: [
+            if (loginController.isUserSelected == false)
+              Icon(
+                Icons.home,
+                color: AppColor.textLight,
+                size: 30,
+              ),
             Icon(
               Icons.content_paste_search,
               color: AppColor.textLight,

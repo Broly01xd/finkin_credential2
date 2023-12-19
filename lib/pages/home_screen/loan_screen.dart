@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_credential/controller/info_controller.dart';
 import 'package:finkin_credential/models/loan_model/loan_model.dart';
 import 'package:finkin_credential/pages/loan_information/infodisplay.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
@@ -22,8 +23,18 @@ class LoanScreen extends StatefulWidget {
 
 class _LoanScreenState extends State<LoanScreen> {
   final LoginController loginController = Get.put(LoginController());
+  final UserInfoController userInfoController = Get.put(UserInfoController());
   final CollectionReference loansCollection =
       FirebaseFirestore.instance.collection('Loan');
+
+  @override
+  void initState() {
+    super.initState();
+    String id = loginController.agentId.value;
+    userInfoController.fetchAgentDetails(id);
+
+    print("Image URL: ${userInfoController.userid.value}");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +49,24 @@ class _LoanScreenState extends State<LoanScreen> {
           stream: widget.title == 'Approved'
               ? loansCollection
                   .where('Status', isEqualTo: LoanStatus.approved.name)
-                  .where('AgentId', isEqualTo: id)
+                  .where(loginController.isUserSelected ? 'UserId' : 'AgentId',
+                      isEqualTo: id)
                   .snapshots()
-              : loansCollection.where('AgentId', isEqualTo: id).snapshots(),
+              : loansCollection
+                  .where(loginController.isUserSelected ? 'UserId' : 'AgentId',
+                      isEqualTo: id)
+                  .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator(
+                color: AppColor.primary,
+              );
             }
-
+            final data = snapshot.requireData;
             List<LoanModel> loanItems = snapshot.data!.docs
                 .map((DocumentSnapshot doc) => LoanModel.fromSnapshot(
                     doc as DocumentSnapshot<Map<String, dynamic>>))
@@ -59,10 +76,11 @@ class _LoanScreenState extends State<LoanScreen> {
               itemCount: loanItems.length,
               itemBuilder: (context, index) {
                 final loan = loanItems[index];
+                final documentId = data.docs[index].id;
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: LoanTrack(
-                    imageAsset: loan.panImg,
+                    imageAsset: userInfoController.userImage.value,
                     userName: loan.userName,
                     loanType: loan.loanType,
                     date: loan.date,
@@ -72,7 +90,8 @@ class _LoanScreenState extends State<LoanScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const InfoDisplay(),
+                          builder: (context) =>
+                              InfoDisplay(documentId: documentId),
                         ),
                       );
                     },
@@ -125,7 +144,9 @@ class _LoanScreenState extends State<LoanScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return CircularProgressIndicator(
+              color: AppColor.primary,
+            );
           }
 
           List<LoanModel> approvedLoans = snapshot.data!.docs
@@ -158,7 +179,7 @@ class _LoanScreenState extends State<LoanScreen> {
                         children: [
                           Text(
                             widget.title,
-                            style: TextStyle(color: AppColor.textLight),
+                            style: const TextStyle(color: AppColor.textLight),
                           ),
                           const SizedBox(height: 10.0),
                           const Row(
@@ -319,6 +340,7 @@ final loanItems = [
     itReturnImg: '',
     secondImg: '',
     monthlyIncome: '',
+    userImage: '',
   ),
   LoanModel(
     image: ImageAsset.pop,
@@ -343,5 +365,6 @@ final loanItems = [
     itReturnImg: '',
     secondImg: '',
     monthlyIncome: '',
+    userImage: '',
   ),
 ];
