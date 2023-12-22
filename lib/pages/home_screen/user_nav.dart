@@ -11,16 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
-class BottomNavBar extends StatefulWidget {
+class UserNav extends StatefulWidget {
   final int initialIndex;
 
-  const BottomNavBar({Key? key, this.initialIndex = 0}) : super(key: key);
+  const UserNav({Key? key, this.initialIndex = 0}) : super(key: key);
 
   @override
-  State<BottomNavBar> createState() => _BottomNavBarState();
+  State<UserNav> createState() => _UserNavState();
 }
 
-class _BottomNavBarState extends State<BottomNavBar> {
+class _UserNavState extends State<UserNav> {
   late PageController _pageController;
   late int _currentIndex;
   late List<Widget> _screens;
@@ -33,7 +33,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     _pageController = PageController(initialPage: _currentIndex);
 
     _screens = [
-       const HomeScreen(),
+       
       const LoanScreen(
         title: 'Loan Tracking',
       ),
@@ -82,24 +82,20 @@ class _BottomNavBarState extends State<BottomNavBar> {
           height: 50,
           color: AppColor.primary,
           index: _currentIndex,
-          items: [
+          items: const [
            
-              const Icon(
-                Icons.home,
-                color: AppColor.textLight,
-                size: 30,
-              ),
-            const Icon(
+             
+            Icon(
               Icons.content_paste_search,
               color: AppColor.textLight,
               size: 30,
             ),
-            const Icon(
+            Icon(
               Icons.book,
               color: AppColor.textLight,
               size: 30,
             ),
-            const Icon(
+            Icon(
               Icons.account_circle_outlined,
               color: AppColor.textLight,
               size: 30,

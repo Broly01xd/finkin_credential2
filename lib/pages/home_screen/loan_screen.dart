@@ -49,11 +49,11 @@ class _LoanScreenState extends State<LoanScreen> {
           stream: widget.title == 'Approved'
               ? loansCollection
                   .where('Status', isEqualTo: LoanStatus.approved.name)
-                  .where(loginController.isUserSelected ? 'UserId' : 'AgentId',
+                  .where(loginController.isUserSelected.value ? 'UserId' : 'AgentId',
                       isEqualTo: id)
                   .snapshots()
               : loansCollection
-                  .where(loginController.isUserSelected ? 'UserId' : 'AgentId',
+                  .where(loginController.isUserSelected.value ? 'UserId' : 'AgentId',
                       isEqualTo: id)
                   .snapshots(),
           builder: (context, snapshot) {

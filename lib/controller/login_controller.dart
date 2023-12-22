@@ -17,7 +17,7 @@ import '../repository/loan_repository/loan_repository.dart';
 class LoginController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool isUserSelected = true;
+  RxBool isUserSelected = true.obs;
 
   var showPrefix = false.obs;
   var isLogin = true;
@@ -43,7 +43,7 @@ class LoginController extends GetxController
   }
 
   void setIsUserSelected(bool isSelected) {
-    isUserSelected = isSelected;
+    isUserSelected.value = isSelected;
     update();
   }
 
@@ -55,7 +55,7 @@ class LoginController extends GetxController
 
   Future<void> getOtp() async {
     try {
-      if (isUserSelected) {
+      if (isUserSelected.value) {
         bool isUserAvailable = await isUserExist(phoneNo.value);
 
         if (isUserAvailable) {
@@ -83,7 +83,7 @@ class LoginController extends GetxController
             colorText: AppColor.errorbar,
           );
         }
-      } else if (!isUserSelected) {
+      } else if (!isUserSelected.value) {
         isButtonClickable.value = false;
         FirebaseAuth.instance.verifyPhoneNumber(
           phoneNumber: '+91${phoneNo.value}',
@@ -113,6 +113,7 @@ class LoginController extends GetxController
           .where('phoneNumber', isEqualTo: phoneNumber)
           .get();
 
+      isUserSelected.value = querySnapshot.docs.isNotEmpty;
       return querySnapshot.docs.isNotEmpty;
     } catch (error) {
       print("Error checking user existence: $error");

@@ -35,7 +35,7 @@ class _AccountScreenState extends State<AccountScreen> {
   void initState() {
     super.initState();
     final id = loginController.agentId.value;
-    (loginController.isUserSelected
+    (loginController.isUserSelected.value
         ? accountController.fetchUserDetails
         : accountController.fetchAgentDetails)(id);
   }
@@ -87,7 +87,7 @@ class _AccountScreenState extends State<AccountScreen> {
         _selectedImage = File(pickedFile.path);
       });
       final agentId = loginController.agentId.value;
-      await (loginController.isUserSelected
+      await (loginController.isUserSelected.value
           ? _uploadUserImageToFirestore(_selectedImage!, agentId)
           : _uploadImageToFirestore(_selectedImage!, agentId));
       print('Image selected and uploaded to Firestore');

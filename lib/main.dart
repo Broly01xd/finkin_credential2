@@ -1,4 +1,6 @@
+import 'package:finkin_credential/pages/home_screen/bottom_nav.dart';
 import 'package:finkin_credential/repository/agent_repository/authentication_repository.dart';
+import 'package:finkin_credential/splash/splash_screen.dart';
 import 'package:finkin_credential/utils/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,10 @@ void main() async {
   try {
     await Firebase.initializeApp(
             options: DefaultFirebaseOptions.currentPlatform)
-        .then((value) => Get.put(AuthenticationRepository()));
+        .then((value) {
+      final auth = Get.put(AuthenticationRepository());
+      auth.onReady();
+    });
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
@@ -23,8 +28,10 @@ void main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   final loginController = Get.put(LoginController());
+  final authController = AuthenticationRepository();
   @override
   Widget build(BuildContext context) {
+    authController.onReady();
     return GetMaterialApp(
       themeMode: ThemeMode.light,
       theme: ThemeData(
@@ -36,7 +43,10 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: MyRoutes.splashscreen,
+      // initialRoute: MyRoutes.splashscreen,
+      home: Obx(() => authController.firebaseAgent.value == null
+          ? SplashScreen()
+          : BottomNavBar()),
       onGenerateRoute: MyRoutes.generateRoute,
     );
   }
