@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_credential/controller/account_controller.dart';
 import 'package:finkin_credential/controller/login_controller.dart';
 import 'package:finkin_credential/models/loan_model/loan_model.dart';
-import 'package:finkin_credential/pages/home_screen/bottom_nav.dart';
 import 'package:finkin_credential/repository/agent_repository/agent_repository.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -12,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+
+import '../home_screen/user_nav.dart';
 
 class UserScreen extends StatefulWidget {
   const UserScreen({super.key});
@@ -186,7 +187,7 @@ class _UserScreenState extends State<UserScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const BottomNavBar(),
+                              builder: (context) => const UserNav(),
                             ),
                           );
                         },

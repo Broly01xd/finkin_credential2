@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:finkin_credential/pages/home_screen/user_nav.dart';
 import 'package:get/get.dart';
 
 class UserInfoController extends GetxController {
@@ -86,6 +87,7 @@ class UserInfoController extends GetxController {
         agentImg.value = userDoc['ImageUrl'] ?? '';
       } else {
         print("User with agentId $agentId not found");
+        Get.to(UserNav());
       }
     } catch (e) {
       print("Error fetching user details: $e");

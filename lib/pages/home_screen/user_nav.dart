@@ -1,12 +1,10 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:finkin_credential/controller/login_controller.dart';
 import 'package:finkin_credential/pages/home_screen/account_screen.dart';
-import 'package:finkin_credential/pages/home_screen/home_screen.dart';
-import 'package:finkin_credential/pages/home_screen/loan_screen.dart';
+import 'package:finkin_credential/pages/home_screen/user_loan_screen.dart';
 import 'package:finkin_credential/repository/agent_repository/authentication_repository.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:finkin_credential/res/constants/enums/enums.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -14,7 +12,7 @@ import 'package:get/get.dart';
 class UserNav extends StatefulWidget {
   final int initialIndex;
 
-  const UserNav({Key? key, this.initialIndex = 0}) : super(key: key);
+  const UserNav({super.key, this.initialIndex = 0});
 
   @override
   State<UserNav> createState() => _UserNavState();
@@ -25,7 +23,7 @@ class _UserNavState extends State<UserNav> {
   late int _currentIndex;
   late List<Widget> _screens;
   final LoginController loginController = Get.put(LoginController());
-    final AuthenticationRepository auth = Get.put(AuthenticationRepository());
+  final AuthenticationRepository auth = Get.put(AuthenticationRepository());
   @override
   void initState() {
     super.initState();
@@ -33,11 +31,10 @@ class _UserNavState extends State<UserNav> {
     _pageController = PageController(initialPage: _currentIndex);
 
     _screens = [
-       
-      const LoanScreen(
+      const UserLoanScreen(
         title: 'Loan Tracking',
       ),
-      const LoanScreen(
+      const UserLoanScreen(
         title: 'Approved',
         status: LoanStatus.approved,
       ),
@@ -83,8 +80,6 @@ class _UserNavState extends State<UserNav> {
           color: AppColor.primary,
           index: _currentIndex,
           items: const [
-           
-             
             Icon(
               Icons.content_paste_search,
               color: AppColor.textLight,

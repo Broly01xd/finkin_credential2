@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_credential/controller/info_controller.dart';
 import 'package:finkin_credential/models/loan_model/loan_model.dart';
-import 'package:finkin_credential/pages/loan_information/infodisplay.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:finkin_credential/res/constants/enums/enums.dart';
 import 'package:finkin_credential/res/image_asset/image_asset.dart';
@@ -10,18 +9,19 @@ import 'package:get/get.dart';
 
 import '../../controller/login_controller.dart';
 import '../../shared/widgets/Loan_Tracking_widget/loan_track.dart';
+import '../loan_information/user_info_display.dart';
 
-class LoanScreen extends StatefulWidget {
+class UserLoanScreen extends StatefulWidget {
   final String title;
   final LoanStatus? status;
-  const LoanScreen({Key? key, required this.title, this.status})
+  const UserLoanScreen({Key? key, required this.title, this.status})
       : super(key: key);
 
   @override
-  State<LoanScreen> createState() => _LoanScreenState();
+  State<UserLoanScreen> createState() => _UserLoanScreenState();
 }
 
-class _LoanScreenState extends State<LoanScreen> {
+class _UserLoanScreenState extends State<UserLoanScreen> {
   final LoginController loginController = Get.put(LoginController());
   final UserInfoController userInfoController = Get.put(UserInfoController());
   final CollectionReference loansCollection =
@@ -49,9 +49,9 @@ class _LoanScreenState extends State<LoanScreen> {
           stream: widget.title == 'Approved'
               ? loansCollection
                   .where('Status', isEqualTo: LoanStatus.approved.name)
-                  .where('AgentId', isEqualTo: id)
+                  .where('UserId', isEqualTo: id)
                   .snapshots()
-              : loansCollection.where('AgentId', isEqualTo: id).snapshots(),
+              : loansCollection.where('UserId', isEqualTo: id).snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
@@ -76,7 +76,7 @@ class _LoanScreenState extends State<LoanScreen> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: LoanTrack(
-                    imageAsset: loan.userImage,
+                    imageAsset: userInfoController.userImage.value,
                     userName: loan.userName,
                     loanType: loan.loanType,
                     date: loan.date,
@@ -87,7 +87,7 @@ class _LoanScreenState extends State<LoanScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              InfoDisplay(documentId: documentId),
+                              UserInfoDisplay(documentId: documentId),
                         ),
                       );
                     },

@@ -1,4 +1,5 @@
 import 'package:finkin_credential/pages/home_screen/bottom_nav.dart';
+import 'package:finkin_credential/pages/home_screen/user_nav.dart';
 import 'package:finkin_credential/repository/agent_repository/authentication_repository.dart';
 import 'package:finkin_credential/splash/splash_screen.dart';
 import 'package:finkin_credential/utils/routes.dart';
@@ -44,9 +45,15 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // initialRoute: MyRoutes.splashscreen,
-      home: Obx(() => authController.firebaseAgent.value == null
-          ? SplashScreen()
-          : BottomNavBar()),
+      home: Obx(() {
+        if (authController.firebaseAgent.value == null) {
+          return const SplashScreen();
+        } else if (loginController.isUserSelected.value == true) {
+          return const UserNav();
+        } else {
+          return const BottomNavBar();
+        }
+      }),
       onGenerateRoute: MyRoutes.generateRoute,
     );
   }
