@@ -26,12 +26,18 @@ class LoanModel {
   final String itReturnImg;
   final String secondImg;
   final String monthlyIncome;
+  final String nationality;
+  final String empType;
+  final String pin;
   final bool isGranted;
 
   LoanModel(
       {this.id,
       required this.userId,
       required this.agentId,
+      required this.empType,
+      required this.nationality,
+      required this.pin,
       required this.userImage,
       required this.agentName,
       required this.userName,
@@ -59,6 +65,9 @@ class LoanModel {
       "UserId": userId,
       "AgentId": agentId,
       "UserName": userName,
+      "Nationality": nationality,
+      "EmpType": empType,
+      "Pin": pin,
       "AgentName": agentName,
       "AadharImg": aadharImg,
       "UserImage": userImage,
@@ -88,6 +97,9 @@ class LoanModel {
       id: document.id,
       userId: data?["UserId"] ?? "",
       userImage: data?["UserImage"] ?? "",
+      empType: data?["EmpType"] ?? "",
+      nationality: data?["Nationality"] ?? "",
+      pin: data?["Pin"] ?? "",
       agentId: data?["AgentId"] ?? "",
       userName: data?["UserName"] ?? "",
       form16img: data?["Form16Img"] ?? "",

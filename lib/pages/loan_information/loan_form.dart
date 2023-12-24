@@ -240,6 +240,7 @@ class _LoanFormState extends State<LoanForm> {
                 snackPosition: SnackPosition.BOTTOM,
                 backgroundColor: Colors.green.withOpacity(0.1),
                 colorText: Colors.green);
+
             _storeLoanFormData();
             Navigator.push(
               context,
@@ -799,6 +800,9 @@ class _LoanFormState extends State<LoanForm> {
         secondImg: loanFormController.itImg2.value,
         monthlyIncome: controller.income2Controller.text.trim(),
         userImage: '',
+        nationality: controller.nationalityController.text.trim(),
+        pin: controller.pinController.text.trim(),
+        empType: controller.employeeType.value,
       );
       await FirebaseFirestore.instance
           .collection('phoneNumberCollection')

@@ -17,8 +17,16 @@ class UserInfoController extends GetxController {
   var panImg = ''.obs;
   var secondImg = ''.obs;
   var itReturnImg = ''.obs;
+  var form16Img = ''.obs;
+  var bankImg = ''.obs;
   var currentStep = 1.obs;
   var isLoading = true.obs;
+  var aadharNo = ''.obs;
+  var pin = ''.obs;
+  var nation = ''.obs;
+  var panNo = ''.obs;
+  var mincome = ''.obs;
+  var empType = ''.obs;
 
   Future<void> fetchUserDetails(String docId) async {
     try {
@@ -45,8 +53,23 @@ class UserInfoController extends GetxController {
         itReturnImg.value = userDoc['ItReturnImg'] ?? '';
         secondImg.value = userDoc['SecondImg'] ?? '';
         userImage.value = userDoc['UserImage'] ?? '';
-
+        aadharNo.value = userDoc['AadharNo'] ?? '';
+        pin.value = userDoc['Pin'] ?? '';
+        nation.value = userDoc['Nationality'] ?? '';
+        panNo.value = userDoc['Pan'] ?? '';
+        mincome.value = userDoc['MonthlyIncome'] ?? '';
+        empType.value = userDoc['EmpType'] ?? '';
         _updateCurrentStep(status.value);
+        if (empType.value == 'Company Worker') {
+          // If yes, update the observable accordingly
+          mincome.value = userDoc['Income'] ?? '';
+          itReturnImg.value = userDoc['Form16Img'] ?? '';
+          secondImg.value = userDoc['BankImg'] ??
+              ''; // Change this to the desired value or logic
+        } else {
+          // If no, update it with the value from Firestore
+          itReturnImg.value = userDoc['ItReturnImg'] ?? '';
+        }
       } else {
         print("User with agentId $docId not found");
       }

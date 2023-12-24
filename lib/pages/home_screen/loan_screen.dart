@@ -337,6 +337,9 @@ final loanItems = [
     secondImg: '',
     monthlyIncome: '',
     userImage: '',
+    nationality: '',
+    pin: '',
+    empType: '',
   ),
   LoanModel(
     image: ImageAsset.pop,
@@ -362,5 +365,8 @@ final loanItems = [
     secondImg: '',
     monthlyIncome: '',
     userImage: '',
+    nationality: '',
+    pin: '',
+    empType: '',
   ),
 ];

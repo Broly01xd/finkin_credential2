@@ -288,19 +288,21 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                   )
                                 : Column(
                                     children: [
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Pincode',
-                                        hintText: '521707',
+                                        hintText: userInfoController.pin.value,
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Nationality :',
-                                        hintText: 'Indian',
+                                        hintText:
+                                            userInfoController.nation.value,
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Aadhar Card Number ',
-                                        hintText: '9535 0352 1502',
+                                        hintText:
+                                            userInfoController.aadharNo.value,
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
@@ -341,9 +343,10 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                         ],
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Pan Card Number',
-                                        hintText: 'BNFPS7312J',
+                                        hintText:
+                                            userInfoController.panNo.value,
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
@@ -383,26 +386,38 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 10),
-                                      const LabeledTextField2(
-                                        label: 'Monthly Income ',
-                                        hintText: '20,000',
+                                      LabeledTextField2(
+                                        label: 'Employee Type',
+                                        hintText:
+                                            userInfoController.empType.value,
                                       ),
-                                      const Text(
-                                        'IT Return of Two Years',
-                                        style: TextStyle(
+                                      const SizedBox(height: 10),
+                                      LabeledTextField2(
+                                        label: 'Monthly Income ',
+                                        hintText:
+                                            userInfoController.mincome.value,
+                                      ),
+                                      Text(
+                                        userInfoController.empType.value ==
+                                                'Company Worker'
+                                            ? 'Form 16 and Bank Statement'
+                                            : 'IT Return of Two Years',
+                                        style: const TextStyle(
                                           color: AppColor.textPrimary,
                                           fontSize: 16,
                                           fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text(
-                                            'First Year',
+                                          Text(
+                                            userInfoController.empType.value ==
+                                                    'Company Worker'
+                                                ? 'Form 16'
+                                                : 'First Year',
                                             style: TextStyle(
                                               color: AppColor.textPrimary,
                                               fontSize: 16,
@@ -439,9 +454,12 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text(
-                                            'Second Year',
-                                            style: TextStyle(
+                                          Text(
+                                            userInfoController.empType.value ==
+                                                    'Company Worker'
+                                                ? 'Bank Statement'
+                                                : 'Second Year',
+                                            style: const TextStyle(
                                               color: AppColor.textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.normal,

@@ -25,7 +25,7 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
     super.initState();
     String id = loginController.agentId.value;
     userInfoController.fetchUserDetails(widget.documentId);
-
+    userInfoController.fetchAgentDetails(id);
     print("Image URL: ${userInfoController.userid.value}");
   }
 
@@ -287,19 +287,21 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
                                   )
                                 : Column(
                                     children: [
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Pincode',
-                                        hintText: '521707',
+                                        hintText: userInfoController.pin.value,
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Nationality :',
-                                        hintText: 'Indian',
+                                        hintText:
+                                            userInfoController.nation.value,
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Aadhar Card Number ',
-                                        hintText: '9535 0352 1502',
+                                        hintText:
+                                            userInfoController.aadharNo.value,
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
@@ -340,9 +342,10 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
                                         ],
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
                                         label: 'Pan Card Number',
-                                        hintText: 'BNFPS7312J',
+                                        hintText:
+                                            userInfoController.panNo.value,
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
@@ -383,9 +386,16 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
                                         ],
                                       ),
                                       const SizedBox(height: 10),
-                                      const LabeledTextField2(
+                                      LabeledTextField2(
+                                        label: 'Employee Type',
+                                        hintText:
+                                            userInfoController.empType.value,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      LabeledTextField2(
                                         label: 'Monthly Income ',
-                                        hintText: '20,000',
+                                        hintText:
+                                            userInfoController.mincome.value,
                                       ),
                                       const Text(
                                         'IT Return of Two Years',
