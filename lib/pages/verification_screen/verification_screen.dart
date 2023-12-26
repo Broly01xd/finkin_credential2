@@ -135,7 +135,6 @@ class VerificationScreen extends StatelessWidget {
                                   if (form!.validate()) {
                                     form.save();
                                     await authController.getOtp();
-
                                     // Display the message on the same page
                                     authController.statusMessage.value =
                                         "Sending..... OTP to +91${authController.phoneNo.value}.";

@@ -397,22 +397,28 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
                                         hintText:
                                             userInfoController.mincome.value,
                                       ),
-                                      const Text(
-                                        'IT Return of Two Years',
-                                        style: TextStyle(
+                                      Text(
+                                        userInfoController.empType.value ==
+                                                'Company Worker'
+                                            ? 'Form 16 and Bank Statement'
+                                            : 'IT Return of Two Years',
+                                        style: const TextStyle(
                                           color: AppColor.textPrimary,
                                           fontSize: 16,
                                           fontWeight: FontWeight.normal,
                                         ),
                                       ),
-                                      SizedBox(height: 10),
+                                      const SizedBox(height: 10),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text(
-                                            'First Year',
-                                            style: TextStyle(
+                                          Text(
+                                            userInfoController.empType.value ==
+                                                    'Company Worker'
+                                                ? 'Form 16'
+                                                : 'First Year',
+                                            style: const TextStyle(
                                               color: AppColor.textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.normal,
@@ -448,9 +454,12 @@ class _UserInfoDisplayState extends State<UserInfoDisplay> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          const Text(
-                                            'Second Year',
-                                            style: TextStyle(
+                                          Text(
+                                            userInfoController.empType.value ==
+                                                    'Company Worker'
+                                                ? 'Bank Statement'
+                                                : 'Second Year',
+                                            style: const TextStyle(
                                               color: AppColor.textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.normal,
