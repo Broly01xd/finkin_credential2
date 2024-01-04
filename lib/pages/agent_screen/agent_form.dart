@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_credential/controller/agent_form_controller.dart';
 import 'package:finkin_credential/models/agent_model/agent_model.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
@@ -290,9 +291,13 @@ class _AgentFormState extends State<AgentForm> {
                                     controller.selectedAgentType.string.trim(),
                                 isFormFilled: true,
                                 imageUrl: agentFormController.imageUrl.value,
+                                month: '',
+                                year: '',
+                                isAccepted: false,
                               );
 
                               LoginController.instance.createAgent(agent);
+                              _incrementAgentData();
                             } else {
                               SnackBar snackBar = const SnackBar(
                                 content: Text(
@@ -329,6 +334,34 @@ class _AgentFormState extends State<AgentForm> {
         ),
       ),
     );
+  }
+
+  void _incrementAgentData() async {
+    try {
+      // Get a reference to the 'Analytics' collection
+      CollectionReference analyticsCollection =
+          FirebaseFirestore.instance.collection('Analytics');
+
+      // Get the document (assuming you have only one document in the 'Analytics' collection)
+      DocumentSnapshot analyticsDoc =
+          await analyticsCollection.doc('V8Pz6BRGn4X09YvAD1CA').get();
+
+      // Retrieve the current value of TotalLoans
+      int currentTotalAgents = analyticsDoc['TotalAgents'] ?? 0;
+
+      // Increment the TotalLoans by 1
+      int newTotalAgents = currentTotalAgents + 1;
+
+      // Update the TotalLoans field in the Firestore document
+      await analyticsCollection
+          .doc('V8Pz6BRGn4X09YvAD1CA')
+          .update({'TotalAgents': newTotalAgents});
+
+      print('TotalAgents incremented successfully');
+    } catch (e) {
+      print('Error incrementing TotalAgents: $e');
+      // Handle error as needed
+    }
   }
 }
 

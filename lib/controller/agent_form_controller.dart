@@ -10,6 +10,7 @@ class AgentFormController extends GetxController {
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController aadharCardController = TextEditingController();
   final TextEditingController panCardController = TextEditingController();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
 

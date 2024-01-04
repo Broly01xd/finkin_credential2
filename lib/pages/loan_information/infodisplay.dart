@@ -52,7 +52,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
               children: [
                 Image.network(
                   ImageUrl,
-                  height: 500,
+                  height: 420,
                   width: 500,
                   fit: BoxFit.cover,
                 ),
@@ -164,11 +164,15 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                   ),
                                   child: Column(
                                     children: [
-                                      const Align(
+                                      Align(
                                         alignment: Alignment.topCenter,
                                         child: Text(
-                                          "Application Tracking ID : HM-BS-8741550",
-                                          style: TextStyle(
+                                          userInfoController
+                                                      .currentStep.value ==
+                                                  5
+                                              ? "Loan Denied"
+                                              : "Loan Approved",
+                                          style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                             color: AppColor.primary,
@@ -177,21 +181,41 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                       ),
                                       Center(
                                         child: FlutterHorizontalStepper(
+                                          completeStepColor: userInfoController
+                                                      .currentStep.value ==
+                                                  5
+                                              ? AppColor.errorbar
+                                              : AppColor.icon,
                                           titleStyle: const TextStyle(
-                                              color: AppColor.primary),
-                                          steps: const [
+                                              color: AppColor.primary,
+                                              fontSize: 12),
+                                          steps: [
                                             "Application sent",
                                             "Approval Pending",
                                             "Loan Approved",
+                                            if (userInfoController
+                                                    .currentStep.value ==
+                                                5)
+                                              "Loan Denied",
                                           ],
                                           radius: 45,
                                           currentStep: userInfoController
                                               .currentStep.value,
                                           currentStepColor: AppColor.secondary,
-                                          child: const [
-                                            Icon(Icons.bookmark_add_sharp),
-                                            Icon(Icons.hourglass_top_sharp),
-                                            Icon(Icons.check_rounded, size: 32),
+                                          child: [
+                                            const Icon(
+                                                Icons.bookmark_add_sharp),
+                                            const Icon(
+                                                Icons.hourglass_top_sharp),
+                                            const Icon(Icons.check_rounded,
+                                                size: 32),
+                                            if (userInfoController
+                                                    .currentStep.value ==
+                                                5)
+                                              const Icon(
+                                                Icons.cancel_outlined,
+                                                color: AppColor.errorbar,
+                                              ),
                                           ],
                                         ),
                                       ),
@@ -275,8 +299,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                       const SizedBox(height: 10),
                                       LabeledTextField2(
                                         label: 'Date Of Birth ',
-                                        hintText:
-                                            userInfoController.phone.value,
+                                        hintText: userInfoController.dob.value,
                                       ),
                                       const SizedBox(height: 10),
                                       LabeledTextField2(
@@ -418,7 +441,7 @@ class _InfoDisplayState extends State<InfoDisplay> {
                                                     'Company Worker'
                                                 ? 'Form 16'
                                                 : 'First Year',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: AppColor.textPrimary,
                                               fontSize: 16,
                                               fontWeight: FontWeight.normal,

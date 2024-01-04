@@ -240,7 +240,7 @@ class _LoanFormState extends State<LoanForm> {
                 snackPosition: SnackPosition.BOTTOM,
                 backgroundColor: Colors.green.withOpacity(0.1),
                 colorText: Colors.green);
-
+            _incrementLoanData();
             _storeLoanFormData();
             Navigator.push(
               context,
@@ -770,6 +770,34 @@ class _LoanFormState extends State<LoanForm> {
     );
   }
 
+  void _incrementLoanData() async {
+    try {
+      // Get a reference to the 'Analytics' collection
+      CollectionReference analyticsCollection =
+          FirebaseFirestore.instance.collection('Analytics');
+
+      // Get the document (assuming you have only one document in the 'Analytics' collection)
+      DocumentSnapshot analyticsDoc =
+          await analyticsCollection.doc('V8Pz6BRGn4X09YvAD1CA').get();
+
+      // Retrieve the current value of TotalLoans
+      int currentTotalLoans = analyticsDoc['TotalLoans'] ?? 0;
+
+      // Increment the TotalLoans by 1
+      int newTotalLoans = currentTotalLoans + 1;
+
+      // Update the TotalLoans field in the Firestore document
+      await analyticsCollection
+          .doc('V8Pz6BRGn4X09YvAD1CA')
+          .update({'TotalLoans': newTotalLoans});
+
+      print('TotalLoans incremented successfully');
+    } catch (e) {
+      print('Error incrementing TotalLoans: $e');
+      // Handle error as needed
+    }
+  }
+
   void _storeLoanFormData() async {
     try {
       String id = loginController.agentId.value;
@@ -803,6 +831,7 @@ class _LoanFormState extends State<LoanForm> {
         nationality: controller.nationalityController.text.trim(),
         pin: controller.pinController.text.trim(),
         empType: controller.employeeType.value,
+        panNoCpy: controller.panCardController.text.trim(),
       );
       await FirebaseFirestore.instance
           .collection('phoneNumberCollection')

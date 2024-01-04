@@ -12,11 +12,17 @@ class AgentModel {
   final String agentType;
   final bool isFormFilled;
   final String? imageUrl;
+  final String month;
+  final String year;
+  final bool isAccepted;
 
   AgentModel({
     this.id,
     required this.agentId,
+    required this.isAccepted,
     required this.name,
+    required this.month,
+    required this.year,
     required this.phone,
     required this.email,
     required this.aadhar,
@@ -32,6 +38,8 @@ class AgentModel {
       "AgentId": agentId,
       "Name": name,
       "Phone": phone,
+      "Month": month,
+      "Year": year,
       "Email": email,
       "Aadhar": aadhar,
       "Pan": pan,
@@ -39,6 +47,7 @@ class AgentModel {
       "AgentType": agentType,
       "IsFormFilled": isFormFilled,
       "ImageUrl": imageUrl,
+      "IsAccepted": isAccepted,
     };
   }
 
@@ -48,7 +57,10 @@ class AgentModel {
     return AgentModel(
       id: document.id,
       name: data["Name"],
+      isAccepted: data["IsAccepted"],
       phone: data["Phone"],
+      month: data["Month"],
+      year: data["Year"],
       email: data["Email"],
       aadhar: data["Aadhar"],
       pan: data["Pan"],

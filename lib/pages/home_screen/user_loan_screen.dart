@@ -153,7 +153,7 @@ class _UserLoanScreenState extends State<UserLoanScreen> {
           return Stack(
             children: [
               Container(
-                height: 200,
+                height: 90,
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(50),
@@ -167,37 +167,14 @@ class _UserLoanScreenState extends State<UserLoanScreen> {
                 left: 5,
                 right: 0,
                 child: AppBar(
-                  toolbarHeight: 75.0,
                   title: Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 30.0, bottom: 10.0),
+                      padding: const EdgeInsets.only(top: 0.0, bottom: 0.0),
                       child: Column(
                         children: [
                           Text(
                             widget.title,
                             style: const TextStyle(color: AppColor.textLight),
-                          ),
-                          const SizedBox(height: 10.0),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                "This Month ",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                              Text(
-                                "This Year",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                            ],
                           ),
                         ],
                       ),
@@ -206,102 +183,6 @@ class _UserLoanScreenState extends State<UserLoanScreen> {
                   automaticallyImplyLeading: false,
                   backgroundColor: const Color.fromARGB(0, 236, 75, 75),
                   elevation: 0,
-                ),
-              ),
-              Positioned(
-                bottom: 22,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: AppColor.textLight,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Center(
-                        child: RichText(
-                          text: const TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '21',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' /',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '25',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: AppColor.textLight,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Center(
-                        child: RichText(
-                          text: const TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '600',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.icon,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' /',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '700',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],
@@ -340,6 +221,7 @@ final loanItems = [
     nationality: '',
     pin: '',
     empType: '',
+    panNoCpy: '',
   ),
   LoanModel(
     image: ImageAsset.pop,
@@ -368,5 +250,6 @@ final loanItems = [
     nationality: '',
     pin: '',
     empType: '',
+    panNoCpy: '',
   ),
 ];

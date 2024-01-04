@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finkin_credential/pages/home_screen/user_nav.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class UserInfoController extends GetxController {
   var fullName = ''.obs;
@@ -59,6 +60,9 @@ class UserInfoController extends GetxController {
         panNo.value = userDoc['Pan'] ?? '';
         mincome.value = userDoc['MonthlyIncome'] ?? '';
         empType.value = userDoc['EmpType'] ?? '';
+        Timestamp timestamp = userDoc['Date'];
+        DateTime dateTime = timestamp.toDate();
+        dob.value = DateFormat('dd-MM-yyyy').format(dateTime);
         _updateCurrentStep(status.value);
         if (empType.value == 'Company Worker') {
           // If yes, update the observable accordingly
@@ -110,7 +114,7 @@ class UserInfoController extends GetxController {
         agentImg.value = userDoc['ImageUrl'] ?? '';
       } else {
         print("User with agentId $agentId not found");
-        Get.to(UserNav());
+        Get.to(const UserNav());
       }
     } catch (e) {
       print("Error fetching user details: $e");

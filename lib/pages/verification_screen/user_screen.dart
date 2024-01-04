@@ -184,6 +184,7 @@ class _UserScreenState extends State<UserScreen> {
                       margin: const EdgeInsets.only(right: 16.0, top: 216.0),
                       child: ElevatedButton(
                         onPressed: () {
+                          _incrementData();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -236,6 +237,34 @@ class _UserScreenState extends State<UserScreen> {
       }
     } catch (e) {
       print("Error updating field $fieldName in Firestore: $e");
+    }
+  }
+
+  void _incrementData() async {
+    try {
+      // Get a reference to the 'Analytics' collection
+      CollectionReference analyticsCollection =
+          FirebaseFirestore.instance.collection('Analytics');
+
+      // Get the document (assuming you have only one document in the 'Analytics' collection)
+      DocumentSnapshot analyticsDoc =
+          await analyticsCollection.doc('V8Pz6BRGn4X09YvAD1CA').get();
+
+      // Retrieve the current value of TotalLoans
+      int currentTotalUsers = analyticsDoc['TotalUsers'] ?? 0;
+
+      // Increment the TotalLoans by 1
+      int newTotalUsers = currentTotalUsers + 1;
+
+      // Update the TotalLoans field in the Firestore document
+      await analyticsCollection
+          .doc('V8Pz6BRGn4X09YvAD1CA')
+          .update({'TotalUsers': newTotalUsers});
+
+      print('TotalUsers incremented successfully');
+    } catch (e) {
+      print('Error incrementing TotalUsers: $e');
+      // Handle error as needed
     }
   }
 }

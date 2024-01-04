@@ -389,8 +389,11 @@ class _AccountScreenState extends State<AccountScreen> {
   void _showAccountInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: false,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
+        double screenHeight = MediaQuery.of(context).size.height;
+        double targetHeight = screenHeight * 2;
         return SingleChildScrollView(
           child: Container(
             decoration: const BoxDecoration(
@@ -574,7 +577,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
   void _showContactInfoBottomSheet(BuildContext context) {
     showModalBottomSheet(
-      // isScrollControlled: true,
+      isScrollControlled: true,
       context: context,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {

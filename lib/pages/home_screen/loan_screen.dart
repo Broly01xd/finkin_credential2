@@ -5,6 +5,7 @@ import 'package:finkin_credential/pages/loan_information/infodisplay.dart';
 import 'package:finkin_credential/res/app_color/app_color.dart';
 import 'package:finkin_credential/res/constants/enums/enums.dart';
 import 'package:finkin_credential/res/image_asset/image_asset.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +27,8 @@ class _LoanScreenState extends State<LoanScreen> {
   final UserInfoController userInfoController = Get.put(UserInfoController());
   final CollectionReference loansCollection =
       FirebaseFirestore.instance.collection('Loan');
+  final CollectionReference agentsCollection =
+      FirebaseFirestore.instance.collection('Agents');
 
   @override
   void initState() {
@@ -128,6 +131,7 @@ class _LoanScreenState extends State<LoanScreen> {
   }
 
   PreferredSizeWidget _buildApprovedAppBar() {
+    String id = loginController.agentId.value;
     return PreferredSize(
       preferredSize: const Size.fromHeight(280.0),
       child: StreamBuilder<QuerySnapshot>(
@@ -140,7 +144,7 @@ class _LoanScreenState extends State<LoanScreen> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator(
+            return const CircularProgressIndicator(
               color: AppColor.primary,
             );
           }
@@ -150,161 +154,211 @@ class _LoanScreenState extends State<LoanScreen> {
                   doc as DocumentSnapshot<Map<String, dynamic>>))
               .toList();
 
-          return Stack(
-            children: [
-              Container(
-                height: 200,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(50),
-                    bottomRight: Radius.circular(50),
-                  ),
-                  color: AppColor.primary,
-                ),
-              ),
-              Positioned(
-                top: 10,
-                left: 5,
-                right: 0,
-                child: AppBar(
-                  toolbarHeight: 75.0,
-                  title: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 30.0, bottom: 10.0),
-                      child: Column(
-                        children: [
-                          Text(
-                            widget.title,
-                            style: const TextStyle(color: AppColor.textLight),
+          String currentUserUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+          return FutureBuilder<QuerySnapshot>(
+            future: agentsCollection
+                .where('AgentId', isEqualTo: currentUserUid)
+                .get(),
+            builder: (context, agentSnapshot) {
+              if (agentSnapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator(
+                  color: Colors.blue, // Change color as needed
+                );
+              }
+
+              if (agentSnapshot.hasError) {
+                return Text(
+                    'Error fetching agent data: ${agentSnapshot.error}');
+              }
+
+              // Check if the document exists
+              if (agentSnapshot.data!.docs.isEmpty) {
+                return const Text('Agent data not found');
+              }
+
+              // Extract data from the 'Agents' collection
+              Map<String, dynamic>? agentData = agentSnapshot.data!.docs.first
+                  .data() as Map<String, dynamic>?;
+
+              // Check if 'agentData' is not null before using it
+              if (agentData == null) {
+                return const Text('Agent data is null');
+              }
+
+              // Assuming 'AgentId' is a field in 'agentData'
+              String agentIdFromFirestore = agentData['AgentId'];
+
+              // Check if the 'AgentId' matches the current user's ID
+              if (agentIdFromFirestore == currentUserUid) {
+                // Now you can use 'agentData' to access fields from the 'Agents' collection
+                // For example, assuming there is a field 'month' in 'Agents'
+                String agentMonth = agentData['Month'];
+                String agentYear = agentData['Year'];
+
+                // Rest of your UI building logic...
+                return Stack(
+                  children: [
+                    Container(
+                      height: 200,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(50),
+                          bottomRight: Radius.circular(50),
+                        ),
+                        color: AppColor.primary, // Change color as needed
+                      ),
+                    ),
+                    Positioned(
+                      top: 10,
+                      left: 5,
+                      right: 0,
+                      child: AppBar(
+                        toolbarHeight: 75.0,
+                        title: const Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 30.0, bottom: 10.0),
+                            child: Column(
+                              children: [
+                                Text(
+                                  'Approved Loans',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                SizedBox(height: 10.0),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      "This Month ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      "This Year",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10.0),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                "This Month ",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
+                        ),
+                        automaticallyImplyLeading: false,
+                        backgroundColor: const Color.fromARGB(0, 236, 75, 75),
+                        elevation: 0,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 22,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: agentMonth,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: ' /',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: '25',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Text(
-                                "This Year",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
+                            ),
+                          ),
+                          Container(
+                            width: 80,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.0,
+                              ),
+                            ),
+                            child: Center(
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: agentYear,
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: ' /',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const TextSpan(
+                                      text: '700',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                  automaticallyImplyLeading: false,
-                  backgroundColor: const Color.fromARGB(0, 236, 75, 75),
-                  elevation: 0,
-                ),
-              ),
-              Positioned(
-                bottom: 22,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: AppColor.textLight,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Center(
-                        child: RichText(
-                          text: const TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '21',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' /',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '25',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      width: 80,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: AppColor.textLight,
-                          width: 1.0,
-                        ),
-                      ),
-                      child: Center(
-                        child: RichText(
-                          text: const TextSpan(
-                            children: [
-                              TextSpan(
-                                text: '600',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.icon,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' /',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColor.textLight,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '700',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
-                ),
-              ),
-            ],
+                );
+              } else {
+                // Current user is not the agent, handle accordingly
+                return const Text('Current user is not the agent.');
+              }
+            },
           );
         },
       ),
@@ -340,6 +394,7 @@ final loanItems = [
     nationality: '',
     pin: '',
     empType: '',
+    panNoCpy: '',
   ),
   LoanModel(
     image: ImageAsset.pop,
@@ -368,5 +423,6 @@ final loanItems = [
     nationality: '',
     pin: '',
     empType: '',
+    panNoCpy: '',
   ),
 ];
