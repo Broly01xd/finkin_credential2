@@ -827,11 +827,12 @@ class _LoanFormState extends State<LoanForm> {
         itReturnImg: loanFormController.itImg.value,
         secondImg: loanFormController.itImg2.value,
         monthlyIncome: controller.income2Controller.text.trim(),
-        userImage: '',
+        userImage: loanFormController.userImg.value,
         nationality: controller.nationalityController.text.trim(),
         pin: controller.pinController.text.trim(),
         empType: controller.employeeType.value,
         panNoCpy: controller.panCardController.text.trim(),
+        logo: controller.logo,
       );
       await FirebaseFirestore.instance
           .collection('phoneNumberCollection')

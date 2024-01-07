@@ -222,6 +222,7 @@ final loanItems = [
     pin: '',
     empType: '',
     panNoCpy: '',
+    logo: '',
   ),
   LoanModel(
     image: ImageAsset.pop,
@@ -251,5 +252,6 @@ final loanItems = [
     pin: '',
     empType: '',
     panNoCpy: '',
+    logo: '',
   ),
 ];

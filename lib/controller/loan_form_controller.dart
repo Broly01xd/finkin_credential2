@@ -2,14 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoanFormController extends GetxController {
-  RxString aadharImg = ''.obs;
-  RxString panImg = ''.obs;
-  RxString image = ''.obs;
-  RxString form16Img = ''.obs;
-  RxString bankImg = ''.obs;
-  RxString itImg = ''.obs;
-  RxString itImg2 = ''.obs;
+  RxString aadharImg =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString panImg =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString image =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString form16Img =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString bankImg =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString itImg =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString itImg2 =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
+  RxString userImg =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Fimages.jpg?alt=media&token=39facc7b-ef5d-42c5-a31b-dbafff25c7b4'
+          .obs;
   RxBool isLoginAccessGranted = RxBool(false);
+  //dont delete Logo folder in storage and if somehow deleted manually create following url image
+  //logo image is manually created in storage and some
+
+  String logo =
+      'https://firebasestorage.googleapis.com/v0/b/finkin-credential.appspot.com/o/Logo%2Ffink.jpg?alt=media&token=7ebd240b-5807-49a4-ae4d-92a5c1af9d56';
 
   final formKey = GlobalKey<FormState>();
   final TextEditingController firstNameController = TextEditingController();
