@@ -12,8 +12,8 @@ class AgentModel {
   final String agentType;
   final bool isFormFilled;
   final String? imageUrl;
-  final String month;
-  final String year;
+  final int month;
+  final int year;
   final bool isAccepted;
 
   AgentModel({

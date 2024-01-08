@@ -193,8 +193,8 @@ class _LoanScreenState extends State<LoanScreen> {
               if (agentIdFromFirestore == currentUserUid) {
                 // Now you can use 'agentData' to access fields from the 'Agents' collection
                 // For example, assuming there is a field 'month' in 'Agents'
-                String agentMonth = agentData['Month'];
-                String agentYear = agentData['Year'];
+                int agentMonth = agentData['Month'];
+                int agentYear = agentData['Year'];
 
                 // Rest of your UI building logic...
                 return Stack(
@@ -278,7 +278,7 @@ class _LoanScreenState extends State<LoanScreen> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: agentMonth,
+                                      text: '$agentMonth',
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
@@ -321,7 +321,7 @@ class _LoanScreenState extends State<LoanScreen> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: agentYear,
+                                      text: '$agentYear',
                                       style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,

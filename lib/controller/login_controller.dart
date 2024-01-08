@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../models/agent_model/agent_model.dart';
+import '../pages/agent_verification/check_login.dart';
+import '../pages/agent_verification/verification.dart';
 import '../pages/home_screen/bottom_nav.dart';
 import '../pages/verification_screen/user_screen.dart';
 import '../repository/agent_repository/agent_repository.dart';
@@ -158,7 +160,7 @@ class LoginController extends GetxController
         bool isFormFilled = await agentRepo.isAgentFormFilled(agentId);
 
         if (isFormFilled) {
-          Get.to(() => const BottomNavBar(initialIndex: 0));
+          await checkIsAcceptedStatus(phoneNo.value);
         } else {
           Get.to(() => const AgentPage());
         }
@@ -176,6 +178,42 @@ class LoginController extends GetxController
       }
       resendAfter.value = 30;
       isButtonClickable.value = true;
+    }
+  }
+
+  Future<void> checkIsAcceptedStatus(String phoneNumber) async {
+    try {
+      // Retrieve the agent document from Firestore where agentId matches the logged-in agent's ID
+      QuerySnapshot agentDocs = await FirebaseFirestore.instance
+          .collection('Agents')
+          .where('Phone', isEqualTo: phoneNumber)
+          .get();
+
+      // Check if there is exactly one document that matches the query
+      if (agentDocs.docs.length == 1) {
+        DocumentSnapshot agentDoc = agentDocs.docs[0];
+        bool isAccepted = agentDoc['IsAccepted'] ?? false;
+
+        if (isAccepted) {
+          // If isAccepted is true, navigate to BottomNavBar
+          Get.off(() => const BottomNavBar());
+        } else {
+          // If isAccepted is false, navigate to VerifyAgent
+          Get.off(() => const VerifyAgent());
+        }
+      } else if (agentDocs.docs.isEmpty) {
+        // Handle the case when the agent document doesn't exist
+        print('Agent document not found for ID: ');
+        // You may want to display an error message or handle it accordingly
+      } else {
+        // Handle the case when there are multiple documents with the same agentId
+        print('Multiple agent documents found for ID: ');
+        // You may want to display an error message or handle it accordingly
+      }
+    } catch (e) {
+      // Handle any potential errors during the Firestore operation
+      print('Error checking isAccepted status: $e');
+      // You may want to display an error message or handle it accordingly
     }
   }
 
@@ -221,7 +259,7 @@ class LoginController extends GetxController
 
   Future<void> createAgent(AgentModel agent) async {
     await agentRepo.createAgent(agent);
-    Get.to(() => const BottomNavBar());
+    Get.to(() => const CheckLogin());
   }
 
   Future<void> createLoan(LoanModel loan) async {

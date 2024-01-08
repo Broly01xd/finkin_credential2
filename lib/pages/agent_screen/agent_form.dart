@@ -291,8 +291,8 @@ class _AgentFormState extends State<AgentForm> {
                                     controller.selectedAgentType.string.trim(),
                                 isFormFilled: true,
                                 imageUrl: agentFormController.imageUrl.value,
-                                month: '',
-                                year: '',
+                                month: 0,
+                                year: 0,
                                 isAccepted: false,
                               );
 
